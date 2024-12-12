@@ -2,9 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EstabelecimentosController;
+use App\Livewire\Counter;
+ 
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/estabelecimentos', [EstabelecimentosController::class, 'index']);
+Route::get('/', [EstabelecimentosController::class, 'index']);

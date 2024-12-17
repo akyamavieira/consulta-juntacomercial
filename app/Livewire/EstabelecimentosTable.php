@@ -28,7 +28,7 @@ class EstabelecimentosTable extends Component
     {
         // Busca os detalhes do estabelecimento pelo CNPJ
         $dados = $this->estabelecimentoService->getEstabelecimentoPorCnpj($cnpj)['registrosRedesim']['registroRedesim'][0]['dadosRedesim'];
-        //dd($dados);
+        dd($dados);
         $this->detalhesEstabelecimento = [
             'cnpj' => $dados['cnpj'] ?? 'Campo não informado',
             'nomeEmpresarial' => $dados['nomeEmpresarial'] ?? 'Campo não informado',

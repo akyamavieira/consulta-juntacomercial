@@ -52,7 +52,7 @@ class EstabelecimentoService
                                     Log::warning("Aguarde $waitTime segundos até as {$nextRequestTime->format('H:i:s')} para tentar novamente.");
                                     //dd($waitTime);
                                     // Redirecionar para uma página de erro com o tempo restante
-                                    return redirect()->route('test', [
+                                    return redirect()->route('wait', [
                                         'waitTime' => $waitTime,
                                         'nextRequestTime' => $nextRequestTime->format('H:i:s')
                                     ]);

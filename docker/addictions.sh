@@ -6,23 +6,7 @@ apt-get update && apt-get install -y \
     gnupg2 \
     lsb-release \
     software-properties-common \
-    unixodbc-dev \
     git \
-    libzip-dev \
-    libldap2-dev
-
-# Instalar extensões PHP
-docker-php-ext-install ldap zip
-
-# Configurar o repositório Microsoft para msodbcsql17
-echo "deb [arch=amd64] https://packages.microsoft.com/debian/12/prod/ $(lsb_release -cs) main" > /etc/apt/sources.list.d/microsoft-prod.list
-curl -sSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-apt-get update
-ACCEPT_EULA=Y apt-get install -y msodbcsql17
-
-# Instalar a extensão pdo_sqlsrv via PECL
-pecl install pdo_sqlsrv
-docker-php-ext-enable pdo_sqlsrv
 
 # Limpar pacotes não necessários
 apt-get clean

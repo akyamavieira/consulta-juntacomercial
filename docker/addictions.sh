@@ -23,4 +23,4 @@ php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 rm composer-setup.php
 
 # Atualizar dependências do Composer
-composer update && composer install
+composer install && composer update

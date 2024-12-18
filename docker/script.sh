@@ -2,7 +2,7 @@
 
 # Configurar o VirtualHost para Laravel
 echo "<VirtualHost *:80>
-    ServerAlias *
+    ServerAlias consulta-jucerr-homolog.rr.sebrae.com.br
     DocumentRoot /var/www/html/public
     <Directory /var/www/html/public>
         Options Indexes FollowSymLinks

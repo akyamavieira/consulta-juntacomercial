@@ -2,7 +2,8 @@
     <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow">
         <thead>
             <tr class="bg-gray-100 text-left">
-                <th class="px-6 py-3 text-sm font-medium text-gray-600">Nome Empresarial</th>
+                <th class="px-6 py-3 text-sm font-medium text-gray-600">Empresa</th>
+                <th class="px-6 py-3 text-sm font-medium text-gray-600">Responsável</th>
                 <th class="px-6 py-3 text-sm font-medium text-gray-600">Ação</th>
             </tr>
         </thead>
@@ -11,6 +12,9 @@
                 <tr class="border-t">
                     <td class="px-6 py-4 text-sm text-gray-800">
                         {{ $estabelecimento['dadosRedesim']['nomeEmpresarial'] }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-800">
+                        {{ $estabelecimento['dadosRedesim']['responsavelPeranteCnpj']['nomeResponsavel'] }}
                     </td>
                     <td class="px-6 py-4">
                         <button wire:click="mostrarDetalhes('{{ $estabelecimento['dadosRedesim']['cnpj'] }}')"

@@ -45,14 +45,14 @@ class EstabelecimentosTable extends Component
             'ultimaViabilidadeAnaliseEndereco' => $dados['ultimaViabilidadeAnaliseEndereco'] ?? 'Campo não informado',
             'dataUltimaAnaliseEndereco' => $dados['dataUltimaAnaliseEndereco'] ?? 'Campo não informado',
             'ultimoColetorEstadualWebVinculado' => $dados['ultimoColetorEstadualWebVinculado'] ?? 'Campo não informado',
-            'endereco_cep'=> $dados['endereco']['cep'] ?? 'Campo não informado',
-            'endereco_logradouro'=> $dados['endereco']['logradouro'] ?? 'Campo não informado',
-            'endereco_codTipoLogradouro'=> $dados['endereco']['codTipoLogradouro'] ?? 'Campo não informado',
-            'endereco_numLogradouro'=> $dados['endereco']['numLogradouro'] ?? 'Campo não informado',
-            'endereco_complemento'=> $dados['endereco']['complemento'] ?? 'Campo não informado',
-            'endereco_bairro'=> $dados['endereco']['bairro'] ?? 'Campo não informado',
-            'endereco_codMunicipio'=> $dados['endereco']['codMunicipio'] ?? 'Campo não informado',
-            'endereco_uf'=> $dados['endereco']['uf'] ?? 'Campo não informado',
+            'endereco_cep' => $dados['endereco']['cep'] ?? 'Campo não informado',
+            'endereco_logradouro' => $dados['endereco']['logradouro'] ?? 'Campo não informado',
+            'endereco_codTipoLogradouro' => $dados['endereco']['codTipoLogradouro'] ?? 'Campo não informado',
+            'endereco_numLogradouro' => $dados['endereco']['numLogradouro'] ?? 'Campo não informado',
+            'endereco_complemento' => $dados['endereco']['complemento'] ?? 'Campo não informado',
+            'endereco_bairro' => $dados['endereco']['bairro'] ?? 'Campo não informado',
+            'endereco_codMunicipio' => $dados['endereco']['codMunicipio'] ?? 'Campo não informado',
+            'endereco_uf' => $dados['endereco']['uf'] ?? 'Campo não informado',
             'contato_ddd' => $dados['contato']['dddTelefone1'] ?? 'Campo não informado',
             'contato_telefone1' => $dados['contato']['telefone1'] ?? 'Campo não informado',
             'contato_email' => $dados['contato']['correioEletronico'] ?? 'Campo não informado'
@@ -60,7 +60,6 @@ class EstabelecimentosTable extends Component
 
         $this->mostrarModal = true;
     }
-    
     public function fecharModal()
     {
         $this->mostrarModal = false; // Fecha o modal

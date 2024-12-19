@@ -10,7 +10,7 @@ use Log;
 
 class EstabelecimentoService
 {
-    private $testabelecimentos;
+    private $estabelecimentos;
     public function getEstabelecimentos()
     {
         // Tenta pegar os dados do cache

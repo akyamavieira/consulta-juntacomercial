@@ -10,14 +10,15 @@ use Log;
 
 class EstabelecimentoService
 {
+    private $testabelecimentos;
     public function getEstabelecimentos()
     {
         // Tenta pegar os dados do cache
-        $estabelecimentos = Cache::get('estabelecimentos');
-        //dd($estabelecimentos);
+        $this->estabelecimentos = Cache::get('estabelecimentos');
+        //dd($this->estabelecimentos);
 
         // Verifica se os dados estão no cache
-        if (!$estabelecimentos) {
+        if (!$this->estabelecimentos) {
             Log::info('Cache não encontrado, fazendo a requisição HTTP...');
 
             try {
@@ -30,8 +31,8 @@ class EstabelecimentoService
                 ]);
                 // Verifica se a resposta foi bem-sucedida
                 if ($response->successful() && $response->json()['status'] === 'OK') {
-                    $estabelecimentos = $response->json();
-                    Cache::put('estabelecimentos', $estabelecimentos, now()->addMinutes(5));
+                    $this->estabelecimentos = $response->json();
+                    Cache::put('estabelecimentos', $this->estabelecimentos, now()->addMinutes(5));
                     Log::info('Dados armazenados no cache com sucesso.');
                 } else {
                     // Log detalhado em caso de erro HTTP
@@ -72,7 +73,7 @@ class EstabelecimentoService
         }
 
         // Retorna os dados ou o fallback seguro
-        return $estabelecimentos;
+        return $this->estabelecimentos;
     }
     public function getEstabelecimentoPorCnpj(string $cnpj)
     {
@@ -92,8 +93,8 @@ class EstabelecimentoService
 
             // Faz a requisição HTTP para buscar os dados
             $response = Http::post('https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest/wsE031/consultaEstabelecimentoPorCnpj', [
-                'accessKeyId' => 'RRD888LV0UDLW2KLGYKJ',
-                'secretAccessKey' => 'uVdd7NOtdXsJJjVNis5fg6faJ4IOWCXRTMD9wTQy',
+                'accessKeyId' => env('ACCESS_KEY_ID'),
+                'secretAccessKey' => env('SECRET_ACCESS_KEY'),
                 'cnpj' => $cnpj
             ]);
 

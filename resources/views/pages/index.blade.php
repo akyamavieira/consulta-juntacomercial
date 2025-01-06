@@ -10,7 +10,6 @@
 
 @section('content')
 <div>
-    <h1>Lista de Estabelecimentos</h1>
     @livewire('estabelecimentos-table')
 </div>
 @endsection

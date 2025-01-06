@@ -23,10 +23,4 @@ php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 rm composer-setup.php
 
 # Atualizar dependências do Composer
-composer update && composer install
-
-# Instalar o OpenSSL e copiar o arquivo de configuração
-apt-get update -yqq
-apt-get install -y --no-install-recommends openssl
-rm -rf /var/lib/apt/lists/*
-cp /var/www/html/docker/openssl.cnf /etc/ssl/openssl.cnf
+composer install && composer update

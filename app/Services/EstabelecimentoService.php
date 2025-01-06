@@ -28,12 +28,20 @@ class EstabelecimentoService
         );
     }
 
-    public function getEstabelecimentoPorCnpj(string $cnpj)
-    {
+    public function getEstabelecimentoPorIdentificador(string $identificador){
+        $estabelecimentos = Cache::get('estabelecimentos');
+
+        if ($estabelecimentos && is_array($estabelecimentos)) {
+            $estabelecimento = collect($estabelecimentos)->firstWhere('identificador', $identificador);
+            if ($estabelecimento) {
+                Log::info("Estabelecimento encontrado no cache geral para o Identificador: $identificador.");
+                return $estabelecimento;
+            }
+        }
         return $this->getCachedData(
-            "estabelecimento_{$cnpj}",
-            self::BASE_URL . '/wsE031/consultaEstabelecimentoPorCnpj',
-            ['cnpj' => $cnpj]
+            "estabelecimento_{$identificador}",
+            self::BASE_URL . '/wsE013/recuperaEstabelecimentoPorIdentificador',
+            ['identificador' => $identificador]
         );
     }
 

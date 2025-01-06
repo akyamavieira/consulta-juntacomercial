@@ -17,7 +17,7 @@
                         {{ $estabelecimento['dadosRedesim']['responsavelPeranteCnpj']['nomeResponsavel'] }}
                     </td>
                     <td class="px-6 py-4">
-                        <button wire:click="mostrarDetalhes('{{ $estabelecimento['dadosRedesim']['cnpj'] }}')"
+                        <button wire:click="mostrarDetalhes('{{ $estabelecimento['identificador'] }}')"
                             class="text-blue-500 hover:text-blue-700">Ver Detalhes</button>
                     </td>
                 </tr>

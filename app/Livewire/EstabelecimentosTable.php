@@ -27,7 +27,8 @@ class EstabelecimentosTable extends Component
     public function mostrarDetalhes($identificador)
     {
         // Busca os detalhes do estabelecimento pelo CNPJ
-        $dados = $this->estabelecimentoService->getEstabelecimentoPorIdentificador($identificador)['registrosRedesim']['registroRedesim'][0]['dadosRedesim'];
+        //dd($identificador);
+        $dados = $this->estabelecimentoService->getEstabelecimentoPorIdentificador($identificador);
         //dd($dados);
         $this->detalhesEstabelecimento = [
             'cnpj' => $dados['cnpj'] ?? 'Campo não informado',

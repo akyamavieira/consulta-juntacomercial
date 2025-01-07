@@ -30,14 +30,13 @@ class EstabelecimentoService
 
     public function getEstabelecimentoPorIdentificador(string $identificador)
     {
-        $estabelecimentos = Cache::get('estabelecimentos');
-
-        if ($estabelecimentos && is_array($estabelecimentos)) {
-            $estabelecimento = collect($estabelecimentos)->firstWhere('identificador', $identificador);
-            if ($estabelecimento) {
-                Log::info("Estabelecimento encontrado no cache geral para o Identificador: $identificador.");
-                return $estabelecimento;
-            }
+        $estabelecimentos = Cache::get('estabelecimentos')["registrosRedesim"]["registroRedesim"];
+        $estabelecimento = collect($estabelecimentos)->firstWhere('identificador', $identificador);
+        //dd($estabelecimento);
+        if ($estabelecimento) {
+            Log::info("Estabelecimento encontrado no cache geral para o Identificador: $identificador.");
+            //dd($estabelecimento["dadosRedesim"]);
+            return $estabelecimento["dadosRedesim"];
         }
         return $this->getCachedData(
             "estabelecimento_{$identificador}",
@@ -46,47 +45,10 @@ class EstabelecimentoService
         );
     }
 
-    public function informaRecebimento(array $identificadores)
-    {
-        try {
-            // Define o payload
-            $payload = [
-                'accessKeyId' => env('ACCESS_KEY_ID'),
-                'secretAccessKey' => env('SECRET_ACCESS_KEY'),
-                'identificador' => $identificadores,
-            ];
-
-            // Faz a requisição HTTP
-            $response = Http::post(self::BASE_URL . '/wsE013/informaRecebimento', $payload);
-
-            // Verifica se a requisição foi bem-sucedida
-            if ($response->successful()) {
-                $data = $response->json();
-
-                // Verifica o status retornado pela API
-                if (($data['codigoRetornoWSEnum'] ?? null) === 'OK') {
-                    Log::info('Recebimento informado com sucesso.', $data);
-                    return $data;
-                }
-
-                // Caso o status não seja "OK", loga o erro
-                Log::warning('Erro ao informar recebimento: ' . ($data['mensagem'] ?? 'Mensagem não especificada.'));
-                return $data;
-            } else {
-                Log::error("Erro na requisição HTTP ao informar recebimento. Status code: " . $response->status());
-                return null;
-            }
-        } catch (Exception $e) {
-            Log::error('Erro ao processar o método informaRecebimento: ' . $e->getMessage());
-            return null;
-        }
-    }
-
     private function getCachedData(string $cacheKey, string $url, array $payload, callable $callback = null)
     {
         try {
             $data = Cache::get($cacheKey);
-            //dd($data);
 
             if ($data) {
                 Log::info("Dados encontrados no cache para a chave: $cacheKey.");
@@ -99,15 +61,14 @@ class EstabelecimentoService
 
             if ($response->successful()) {
                 $data = $response->json();
-                //dd($data);
                 if (is_callable($callback)) {
                     $callback($data);
                 }
 
                 if (is_array($data) && ($data['status'] ?? null) === 'OK') {
                     Cache::put($cacheKey, $data, now()->addMinutes(self::CACHE_TTL));
-                    //dd($data['status']);
                     Log::info("Dados armazenados no cache para a chave: $cacheKey.");
+
                     // Extrai os identificadores
                     $identificadores = collect($data['estabelecimentos'] ?? [])
                         ->pluck('identificador')
@@ -115,9 +76,9 @@ class EstabelecimentoService
 
                     if (!empty($identificadores)) {
                         // Chama o método informaRecebimento com os identificadores
-                        $this->informaRecebimento($identificadores);
+                        $this->informaRecebimento($identificadores); // This is now called only after a successful response
                     }
-                    dd($identificadores);
+
                     return $data;
                 }
 

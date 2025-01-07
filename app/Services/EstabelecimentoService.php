@@ -28,7 +28,8 @@ class EstabelecimentoService
         );
     }
 
-    public function getEstabelecimentoPorIdentificador(string $identificador){
+    public function getEstabelecimentoPorIdentificador(string $identificador)
+    {
         $estabelecimentos = Cache::get('estabelecimentos');
 
         if ($estabelecimentos && is_array($estabelecimentos)) {
@@ -43,6 +44,42 @@ class EstabelecimentoService
             self::BASE_URL . '/wsE013/recuperaEstabelecimentoPorIdentificador',
             ['identificador' => $identificador]
         );
+    }
+
+    public function informaRecebimento(array $identificadores)
+    {
+        try {
+            // Define o payload
+            $payload = [
+                'accessKeyId' => env('ACCESS_KEY_ID'),
+                'secretAccessKey' => env('SECRET_ACCESS_KEY'),
+                'identificador' => $identificadores,
+            ];
+
+            // Faz a requisição HTTP
+            $response = Http::post(self::BASE_URL . '/wsE013/informaRecebimento', $payload);
+
+            // Verifica se a requisição foi bem-sucedida
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // Verifica o status retornado pela API
+                if (($data['codigoRetornoWSEnum'] ?? null) === 'OK') {
+                    Log::info('Recebimento informado com sucesso.', $data);
+                    return $data;
+                }
+
+                // Caso o status não seja "OK", loga o erro
+                Log::warning('Erro ao informar recebimento: ' . ($data['mensagem'] ?? 'Mensagem não especificada.'));
+                return $data;
+            } else {
+                Log::error("Erro na requisição HTTP ao informar recebimento. Status code: " . $response->status());
+                return null;
+            }
+        } catch (Exception $e) {
+            Log::error('Erro ao processar o método informaRecebimento: ' . $e->getMessage());
+            return null;
+        }
     }
 
     private function getCachedData(string $cacheKey, string $url, array $payload, callable $callback = null)
@@ -71,6 +108,16 @@ class EstabelecimentoService
                     Cache::put($cacheKey, $data, now()->addMinutes(self::CACHE_TTL));
                     //dd($data['status']);
                     Log::info("Dados armazenados no cache para a chave: $cacheKey.");
+                    // Extrai os identificadores
+                    $identificadores = collect($data['estabelecimentos'] ?? [])
+                        ->pluck('identificador')
+                        ->all();
+
+                    if (!empty($identificadores)) {
+                        // Chama o método informaRecebimento com os identificadores
+                        $this->informaRecebimento($identificadores);
+                    }
+                    dd($identificadores);
                     return $data;
                 }
 

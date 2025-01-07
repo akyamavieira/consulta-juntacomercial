@@ -15,7 +15,7 @@ COPY docker/script.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.sh
 
 # Executar o script para instalar dependências e configurar o ambiente
-RUN /usr/local/bin/addicitons.sh
+RUN /usr/local/bin/addictions.sh
 
 # Definir permissões corretas
 RUN chown -R www-data:www-data /var/www/html \

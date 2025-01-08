@@ -18,7 +18,7 @@ Route::get('/callback/keycloak', function () {
     $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
     $driver->setHttpClient($guzzleClient);
 
-    return $driver->stateless()->user();
+    $user = $driver->stateless()->user();
 
     // Aqui você pode salvar o usuário ou criar a lógica de login
     dd($user);

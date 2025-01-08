@@ -12,7 +12,7 @@ Route::get('/wait', function () {
 
 Route::get('/callback/keycloak', function () {
     /** @var \Laravel\Socialite\Two\AbstractProvider  */
-    $driver = Socialite::driver('google');
+    $driver = Socialite::driver('keycloak');
 
     return $driver->stateless()->user();
 

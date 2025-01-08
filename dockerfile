@@ -14,6 +14,21 @@ COPY docker/script.sh /usr/local/bin/
 # Dar permissões de execução aos scripts
 RUN chmod +x /usr/local/bin/*.sh
 
+# Atualizar o sistema e instalar as dependências diretamente no Dockerfile
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg2 \
+    lsb-release \
+    software-properties-common \
+    git \
+    zip \
+    unzip \
+    libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Limpar pacotes não necessários
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Executar o script para instalar dependências e configurar o ambiente
 RUN /usr/local/bin/addictions.sh
 

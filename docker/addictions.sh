@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# Atualizar o sistema e instalar dependências
-apt-get update && apt-get install -y \
-    curl \
-    gnupg2 \
-    lsb-release \
-    software-properties-common \
-    git \
-
-# Limpar pacotes não necessários
-apt-get clean
-rm -rf /var/lib/apt/lists/*
-
 # Instalar Node.js
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs

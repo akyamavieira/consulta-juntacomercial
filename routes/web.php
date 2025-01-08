@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\auth\KeycloakCallBack;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EstabelecimentosController;
 use Laravel\Socialite\Facades\Socialite;
@@ -10,18 +11,7 @@ Route::get('/wait', function () {
     return view('errors.wait');
 })->name("wait");
 
-Route::get('/callback/keycloak', function () {
-    /** @var \Laravel\Socialite\Two\AbstractProvider  */
-    $driver = Socialite::driver('keycloak');
-
-    // Ignora a verificação SSL
-    $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
-    $driver->setHttpClient($guzzleClient);
-
-    $user = $driver->stateless()->user();
-
-    return redirect()->to('/home');
-});
+Route::get('/callback/keycloak', [KeycloakCallBack::class, 'keycloakCallBack']);
 
 Route::get('/login', function (){
     return Socialite::driver('keycloak')->redirect();

@@ -18,18 +18,21 @@ class EstabelecimentosTable extends Component
     {
         $this->estabelecimentoService = $estabelecimentoService;
     }
-
     public function mount()
     {
-        $this->estabelecimentos = $this->estabelecimentoService->getEstabelecimentos();
+        $this->atualizarEstabelecimentos();
     }
 
+    public function atualizarEstabelecimentos()
+    {
+        // Busca estabelecimentos do serviço com cache já configurado
+        $this->estabelecimentos = $this->estabelecimentoService->getEstabelecimentos();
+    }
+    
     public function mostrarDetalhes($identificador)
     {
         // Busca os detalhes do estabelecimento pelo CNPJ
-        //dd($identificador);
         $dados = $this->estabelecimentoService->getEstabelecimentoPorIdentificador($identificador);
-        //dd($dados);
         $this->detalhesEstabelecimento = [
             'cnpj' => $dados['cnpj'] ?? 'Campo não informado',
             'nomeEmpresarial' => $dados['nomeEmpresarial'] ?? 'Campo não informado',

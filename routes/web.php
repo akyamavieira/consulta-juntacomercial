@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EstabelecimentosController;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\AbstractProvider;
 
 Route::get('/', [EstabelecimentosController::class, 'index'])->name('index');
 Route::get('/wait', function () {
@@ -10,7 +11,10 @@ Route::get('/wait', function () {
 })->name("wait");
 
 Route::get('/callback/keycloak', function () {
-    $user = Socialite::driver('keycloak')->user();
+    /** @var \Laravel\Socialite\Two\AbstractProvider  */
+    $driver = Socialite::driver('google');
+
+    return $driver->stateless()->user();
 
     // Aqui você pode salvar o usuário ou criar a lógica de login
     dd($user);

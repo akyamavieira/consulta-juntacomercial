@@ -14,6 +14,10 @@ Route::get('/callback/keycloak', function () {
     /** @var \Laravel\Socialite\Two\AbstractProvider  */
     $driver = Socialite::driver('keycloak');
 
+    // Ignora a verificação SSL
+    $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
+    $driver->setHttpClient($guzzleClient);
+
     return $driver->stateless()->user();
 
     // Aqui você pode salvar o usuário ou criar a lógica de login

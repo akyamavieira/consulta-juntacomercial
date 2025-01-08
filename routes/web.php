@@ -20,10 +20,7 @@ Route::get('/callback/keycloak', function () {
 
     $user = $driver->stateless()->user();
 
-    // Aqui você pode salvar o usuário ou criar a lógica de login
-    dd($user);
-
-    //return redirect()->to('/home');
+    return redirect()->to('/home');
 });
 
 Route::get('/login', function (){

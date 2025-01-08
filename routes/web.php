@@ -19,6 +19,5 @@ Route::get('/callback/keycloak', function () {
 });
 
 Route::get('/login', function (){
-    session()->forget('state'); 
     return Socialite::driver('keycloak')->redirect();
 });

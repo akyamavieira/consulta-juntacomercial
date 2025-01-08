@@ -4,6 +4,7 @@ namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
 
 class KeycloakCallBack extends Controller
@@ -18,6 +19,9 @@ class KeycloakCallBack extends Controller
         $driver->setHttpClient($guzzleClient);
 
         $user = $driver->stateless()->user();
+
+
+        Session::put('user', $user);
 
         return redirect()->to('/');
     }

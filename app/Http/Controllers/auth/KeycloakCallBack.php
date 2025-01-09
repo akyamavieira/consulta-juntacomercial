@@ -23,7 +23,6 @@ class KeycloakCallBack extends Controller
 
         Session::put('user', $user);
 
-        return redirect('/');
-
+        return redirect()->route('/index');
     }
 }

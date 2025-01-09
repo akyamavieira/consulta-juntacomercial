@@ -14,9 +14,10 @@ Route::get('/wait', function () {
     return view('errors.wait');
 })->name("wait");
 
-Route::get('/callback/keycloak', [KeycloakCallBack::class, 'keycloakCallBack'])
-    ->withoutMiddleware([VerifyKeycloakAuth::class])->name('callback.keycloak');
+Route::get('/callback/keycloak', [KeycloakCallBack::class, 'keycloakCallBack']);
 
 Route::get('/login', function () {
-    return Socialite::driver('keycloak')->redirect();
+    /** @var \Laravel\Socialite\Two\AbstractProvider  */
+    $driver = Socialite::driver('keycloak');
+    return $driver->stateless()->redirect();
 });

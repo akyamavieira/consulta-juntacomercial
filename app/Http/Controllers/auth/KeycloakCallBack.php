@@ -23,6 +23,6 @@ class KeycloakCallBack extends Controller
 
         Session::put('user', $user);
 
-        dd($user);
+        return view('pages.index');
     }
 }

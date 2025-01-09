@@ -21,19 +21,19 @@ class VerifyKeycloakAuth
     public function handle(Request $request, Closure $next): Response
     {
         
-            /** @var \Laravel\Socialite\Two\AbstractProvider */
-            $driver = Socialite::driver('keycloak');
+            // // /** @var \Laravel\Socialite\Two\AbstractProvider */
+            // $driver = Socialite::driver('keycloak');
 
-            // Verifica se o usuário está autenticado na sessão
-            if (!Session::has('user') || !Session::get('user')['id']) {
-                // Previne loops de redirecionamento
-                if ($request->route()->getName() === 'keycloak.callback') {
-                    Log::error('Redirecionamento em loop detectado.');
-                    abort(500, 'Erro de redirecionamento em loop.');
-                }
+            // // Verifica se o usuário está autenticado na sessão
+            // if (!Session::has('user') || !Session::get('user')['id']) {
+            //     // Previne loops de redirecionamento
+            //     if ($request->route()->getName() === 'keycloak.callback') {
+            //         Log::error('Redirecionamento em loop detectado.');
+            //         abort(500, 'Erro de redirecionamento em loop.');
+            //     }
 
-                return $driver->stateless()->redirect();
-            }
+            //     return $driver->stateless()->redirect();
+            // }
             return $next($request);
     }
 }

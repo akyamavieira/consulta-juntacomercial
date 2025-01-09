@@ -47,10 +47,16 @@ class VerifyKeycloakAuth
             // Continua o fluxo da aplicação
             return $next($request);
         } catch (InvalidStateException $e) {
+            /** @var \Laravel\Socialite\Two\AbstractProvider  */
+            $driver = Socialite::driver('keycloak');
+
             // Caso ocorra um erro no OAuth (como um estado inválido)
             Log::error('Erro ao verificar a sessão do Keycloak: InvalidStateException', ['exception' => $e]);
             return $driver->stateless()->redirect();
         } catch (\Exception $e) {
+            /** @var \Laravel\Socialite\Two\AbstractProvider  */
+            $driver = Socialite::driver('keycloak');
+            
             // Captura qualquer outro erro inesperado
             Log::error('Erro inesperado ao verificar a sessão do Keycloak', ['exception' => $e]);
             return $driver->stateless()->redirect();

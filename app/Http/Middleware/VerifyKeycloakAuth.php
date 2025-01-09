@@ -21,43 +21,35 @@ class VerifyKeycloakAuth
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            $currentRoute = Route::currentRouteName();
-
-            // Ignora a rota de callback para evitar loops
-            if ($currentRoute === 'callback.keycloak') {
-                return $next($request);
-            }
-
-            /** @var \Laravel\Socialite\Two\AbstractProvider  */
+            /** @var \Laravel\Socialite\Two\AbstractProvider */
             $driver = Socialite::driver('keycloak');
 
+            // Verifica se o usuário está na sessão
             if (!Session::has('user')) {
                 return $driver->stateless()->redirect();
             }
 
-            // Tenta recuperar o usuário do Keycloak a partir da sessão
             $user = Session::get('user');
 
+            // Verifica se o usuário tem ID válido
             if (!$user || !$user->getId()) {
                 return $driver->stateless()->redirect();
             }
 
+            // Adiciona o usuário na requisição para uso futuro
             $request->merge(['keycloak_user' => $user]);
 
-            // Continua o fluxo da aplicação
             return $next($request);
         } catch (InvalidStateException $e) {
-            /** @var \Laravel\Socialite\Two\AbstractProvider  */
+            /** @var \Laravel\Socialite\Two\AbstractProvider */
             $driver = Socialite::driver('keycloak');
 
-            // Caso ocorra um erro no OAuth (como um estado inválido)
             Log::error('Erro ao verificar a sessão do Keycloak: InvalidStateException', ['exception' => $e]);
             return $driver->stateless()->redirect();
         } catch (\Exception $e) {
-            /** @var \Laravel\Socialite\Two\AbstractProvider  */
+            /** @var \Laravel\Socialite\Two\AbstractProvider */
             $driver = Socialite::driver('keycloak');
-            
-            // Captura qualquer outro erro inesperado
+
             Log::error('Erro inesperado ao verificar a sessão do Keycloak', ['exception' => $e]);
             return $driver->stateless()->redirect();
         }

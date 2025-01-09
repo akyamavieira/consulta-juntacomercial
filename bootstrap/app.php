@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\VerifyKeycloakAuth;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'livewire/*'
         ]);
+        $middleware->append(VerifyKeycloakAuth::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

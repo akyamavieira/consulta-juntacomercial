@@ -24,34 +24,30 @@ class VerifyKeycloakAuth
             /** @var \Laravel\Socialite\Two\AbstractProvider */
             $driver = Socialite::driver('keycloak');
 
-            // Verifica se o usuário está na sessão
-            if (!Session::has('user')) {
+            // Verifica se o usuário está autenticado na sessão
+            if (!Session::has('user') || !Session::get('user')['id']) {
+                // Previne loops de redirecionamento
+                if ($request->route()->getName() === 'keycloak.callback') {
+                    Log::error('Redirecionamento em loop detectado.');
+                    abort(500, 'Erro de redirecionamento em loop.');
+                }
+
                 return $driver->stateless()->redirect();
             }
 
+            // Obtém os dados do usuário da sessão
             $user = Session::get('user');
 
-            // Verifica se o usuário tem ID válido
-            if (!$user || !$user->getId()) {
-                return $driver->stateless()->redirect();
-            }
-
-            // Adiciona o usuário na requisição para uso futuro
+            // Adiciona o usuário à requisição
             $request->merge(['keycloak_user' => $user]);
 
             return $next($request);
         } catch (InvalidStateException $e) {
-            /** @var \Laravel\Socialite\Two\AbstractProvider */
-            $driver = Socialite::driver('keycloak');
-
             Log::error('Erro ao verificar a sessão do Keycloak: InvalidStateException', ['exception' => $e]);
-            return $driver->stateless()->redirect();
+            return redirect()->route('login'); // Redirecionar para a rota de login padrão
         } catch (\Exception $e) {
-            /** @var \Laravel\Socialite\Two\AbstractProvider */
-            $driver = Socialite::driver('keycloak');
-
             Log::error('Erro inesperado ao verificar a sessão do Keycloak', ['exception' => $e]);
-            return $driver->stateless()->redirect();
+            abort(500, 'Erro ao processar a autenticação.');
         }
     }
 }

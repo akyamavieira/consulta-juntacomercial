@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
@@ -20,6 +21,13 @@ class VerifyKeycloakAuth
     public function handle(Request $request, Closure $next): Response
     {
         try {
+            $currentRoute = Route::currentRouteName();
+
+            // Ignora a rota de callback para evitar loops
+            if ($currentRoute === 'callback.keycloak') {
+                return $next($request);
+            }
+
             /** @var \Laravel\Socialite\Two\AbstractProvider  */
             $driver = Socialite::driver('keycloak');
 

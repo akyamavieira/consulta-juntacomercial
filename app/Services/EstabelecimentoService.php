@@ -32,10 +32,8 @@ class EstabelecimentoService
     {
         $estabelecimentos = Cache::get('estabelecimentos')["registrosRedesim"]["registroRedesim"];
         $estabelecimento = collect($estabelecimentos)->firstWhere('identificador', $identificador);
-        //dd($estabelecimento);
         if ($estabelecimento) {
             Log::info("Estabelecimento encontrado no cache geral para o Identificador: $identificador.");
-            //dd($estabelecimento["dadosRedesim"]);
             return $estabelecimento["dadosRedesim"];
         }
         return $this->getCachedData(
@@ -45,10 +43,44 @@ class EstabelecimentoService
         );
     }
 
+    public function informaRecebimento(array $identificadores)
+    {
+        try {
+            // Monta o payload no formato correto
+            $payload = array_merge($this->getAuthCredentials(), ['identificador' => $identificadores]);
+
+            // Faz a requisição HTTP
+            $response = Http::post(self::BASE_URL . '/wsE013/informaRecebimento', $payload);
+
+            // Verifica se a requisição foi bem-sucedida
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // Verifica o status retornado pela API
+                if (($data['codigoRetornoWSEnum'] ?? null) === 'OK') {
+                    Log::info('Recebimento informado com sucesso.', $data);
+                    return $data;
+                }
+
+                // Caso o status não seja "OK", loga o erro
+                Log::warning('Erro ao informar recebimento: ' . ($data['mensagem'] ?? 'Mensagem não especificada.'));
+                return $data;
+            } else {
+                Log::error("Erro na requisição HTTP ao informar recebimento. Status code: " . $response->status());
+                return null;
+            }
+        } catch (Exception $e) {
+            Log::error('Erro ao processar o método informaRecebimento: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
     private function getCachedData(string $cacheKey, string $url, array $payload, callable $callback = null)
     {
         try {
             $data = Cache::get($cacheKey);
+            // $identificadores = collect(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"])->pluck('identificador')->all();
+            //dd($data);
 
             if ($data) {
                 Log::info("Dados encontrados no cache para a chave: $cacheKey.");
@@ -68,13 +100,11 @@ class EstabelecimentoService
                 if (is_array($data) && ($data['status'] ?? null) === 'OK') {
                     Cache::put($cacheKey, $data, now()->addMinutes(self::CACHE_TTL));
                     Log::info("Dados armazenados no cache para a chave: $cacheKey.");
-
+                    //dd(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"]["identificador"]);
                     // Extrai os identificadores
-                    $identificadores = collect($data['estabelecimentos'] ?? [])
-                        ->pluck('identificador')
-                        ->all();
-
+                    $identificadores = collect(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"])->pluck('identificador')->all();
                     if (!empty($identificadores)) {
+                        //dd($identificadores);
                         // Chama o método informaRecebimento com os identificadores
                         $this->informaRecebimento($identificadores); // This is now called only after a successful response
                     }

@@ -7,12 +7,12 @@ use App\Http\Middleware\VerifyKeycloakAuth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\AbstractProvider;
 
-Route::get('/', [EstabelecimentosController::class, 'index'])->name('index');
+Route::get('/', [EstabelecimentosController::class, 'index'])->name('index')->withoutMiddleware([VerifyKeycloakAuth::class]);
 Route::get('/wait', function () {
     return view('errors.wait');
-})->name("wait");
+})->name("wait")->withoutMiddleware([VerifyKeycloakAuth::class]);
 
-Route::get('/callback/keycloak', [KeycloakCallBack::class, 'keycloakCallBack'])->withoutMiddleware([VerifyKeycloakAuth::class]);
+Route::get('/callback/keycloak', [KeycloakCallBack::class, 'keycloakCallBack']);
 
 Route::get('/login', function (){
     return Socialite::driver('keycloak')->redirect();

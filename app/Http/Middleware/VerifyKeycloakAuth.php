@@ -20,7 +20,7 @@ class VerifyKeycloakAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        try {
+        
             /** @var \Laravel\Socialite\Two\AbstractProvider */
             $driver = Socialite::driver('keycloak');
 
@@ -34,20 +34,7 @@ class VerifyKeycloakAuth
 
                 return $driver->stateless()->redirect();
             }
-
-            // Obtém os dados do usuário da sessão
-            $user = Session::get('user');
-
-            // Adiciona o usuário à requisição
-            $request->merge(['keycloak_user' => $user]);
-
             return $next($request);
-        } catch (InvalidStateException $e) {
-            Log::error('Erro ao verificar a sessão do Keycloak: InvalidStateException', ['exception' => $e]);
-            return redirect()->route('login'); // Redirecionar para a rota de login padrão
-        } catch (\Exception $e) {
-            Log::error('Erro inesperado ao verificar a sessão do Keycloak', ['exception' => $e]);
-            abort(500, 'Erro ao processar a autenticação.');
-        }
     }
 }
+

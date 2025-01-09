@@ -7,7 +7,7 @@ use App\Http\Middleware\VerifyKeycloakAuth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\AbstractProvider;
 
-Route::get('/', [EstabelecimentosController::class, 'index'])
+Route::get('/home', [EstabelecimentosController::class, 'index'])
     ->name('index')
     ->middleware([VerifyKeycloakAuth::class]);
 

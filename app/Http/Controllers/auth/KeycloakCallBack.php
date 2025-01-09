@@ -23,7 +23,7 @@ class KeycloakCallBack extends Controller
 
         Session::put('user', $user);
 
-        return header("Location: /home");
+        return redirect('/');
 
     }
 }

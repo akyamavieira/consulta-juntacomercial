@@ -4,6 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Services\EstabelecimentoService;
+use App\DTO\DetalhesEstabelecimentoDTO;
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EstabelecimentosTable extends Component
 {
@@ -21,7 +24,6 @@ class EstabelecimentosTable extends Component
 
     public function mount()
     {
-        //dd($this->atualizarEstabelecimentos());
         $this->atualizarEstabelecimentos();
     }
 
@@ -31,614 +33,229 @@ class EstabelecimentosTable extends Component
         $this->estabelecimentos = $this->estabelecimentoService->getEstabelecimentos();
     }
 
+    public function paginate($items, $perPage = 10, $page = null, $options = [])
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+        $items = is_array($items) ? collect($items) : $items;
+        $total = $items->count();
+        $results = $items->forPage($page, $perPage)->values();
+        return new LengthAwarePaginator(
+            $results,
+            $total,
+            $perPage,
+            $page,
+            array_merge(['path' => request()->url()], $options)
+        );
+    }
+
     public function mostrarTooltip($identificador, $codEvento)
     {
         //dd($codEvento);
         $this->tooltipIdentificador = $identificador;
-        // Switch para associar o código do evento ao texto
-        switch ($codEvento) {
-            case '001':
-                $this->tooltipMessage = 'ENTRADA DE SÓCIO/ADMINISTRADOR';
-                break;
-            case '002':
-                $this->tooltipMessage = 'ALTERAÇÃO DA DATA DE INCLUSÃO';
-                break;
-            case '003':
-                $this->tooltipMessage = 'ALTERAÇÃO DE DADOS DO SÓCIO/ADMINISTRADOR';
-                break;
-            case '005':
-                $this->tooltipMessage = 'SAÍDA DE SÓCIO/ADMINISTRADOR';
-                break;
-            case '006':
-                $this->tooltipMessage = 'ALTERAÇÃO DA DATA DE EXCLUSÃO';
-                break;
-            case '007':
-                $this->tooltipMessage = 'ALTERAÇÃO DA DATA DE INCLUSÃO DE SÓCIO/ADMINISTRADOR EXCLUÍDO';
-                break;
-            case '008':
-                $this->tooltipMessage = 'EXCLUSÃO DE REGISTRO DE SÓCIO/ADMINISTRADOR';
-                break;
-            case '010':
-                $this->tooltipMessage = 'INFORMAÇÃO DE SÓCIO PARA CONFERÊNCIA COM A BASE CNPJ';
-                break;
-            case '011':
-                $this->tooltipMessage = 'ENTRADA DO BENEFICIÁRIO FINAL';
-                break;
-            case '012':
-                $this->tooltipMessage = 'ALTERAÇÃO DE DADOS DO BENEFICIÁRIO FINAL';
-                break;
-            case '013':
-                $this->tooltipMessage = 'SAÍDA DO BENEFICIÁRIO FINAL';
-                break;
-            case '052':
-                $this->tooltipMessage = 'REATIVAÇÃO - ARTIGO 60 LEI 8.934/94';
-                break;
-            case '101':
-                $this->tooltipMessage = 'INSCRIÇÃO DE PRIMEIRO ESTABELECIMENTO';
-                break;
-            case '102':
-                $this->tooltipMessage = 'INSCRIÇÃO DOS DEMAIS ESTABELECIMENTOS';
-                break;
-            case '103':
-                $this->tooltipMessage = 'INSCRIÇÃO DE ESTABELECIMENTO FILIAL DE EMPRESA BRASILEIRA NO EXTERIOR';
-                break;
-            case '105':
-                $this->tooltipMessage = 'INSCRIÇÃO DE EMBAIXADA/CONSULADO/REPRESENTAÇÕES DO GOVERNO NO EXTERIOR';
-                break;
-            case '106':
-                $this->tooltipMessage = 'INSCRIÇÃO DE MISSÕES DIPL./REPART. CONSUL./REPRES. DE ÓRGÃOS INTERNACIONAIS';
-                break;
-            case '107':
-                $this->tooltipMessage = 'INSCRIÇÃO DE PESSOA JURÍDICA DOMICILIADA NO EXTERIOR';
-                break;
-            case '109':
-                $this->tooltipMessage = 'INSCRIÇÃO DE INCORPORAÇÃO IMOBILIÁRIA (PATRIMÔNIO DE AFETAÇÃO)';
-                break;
-            case '110':
-                $this->tooltipMessage = 'INSCRIÇÃO DE PRODUTOR RURAL (PRIMEIRO ESTABELECIMENTO)';
-                break;
-                break;
-            case 204:
-                $this->tooltipMessage = "CISÃO PARCIAL (ESPECÍFICO PARA A SUCEDIDA)";
-                break;
-            case 206:
-                $this->tooltipMessage = "DESCLASSIFICAÇÃO COMO ESTABELECIMENTO UNIFICADOR";
-                break;
-            case 209:
-                $this->tooltipMessage = "ALTERAÇÃO DE ENDEREÇO ENTRE MUNICÍPIOS DENTRO DO MESMO ESTADO";
-                break;
-            case 210:
-                $this->tooltipMessage = "ALTERAÇÃO DE ENDEREÇO ENTRE ESTADOS";
-                break;
-            case 211:
-                $this->tooltipMessage = "ALTERAÇÃO DE ENDEREÇO DENTRO DO MESMO MUNICÍPIO";
-                break;
-            case 214:
-                $this->tooltipMessage = "ALTERAÇÃO DE TELEFONE (DDD/TELEFONE)";
-                break;
-            case 215:
-                $this->tooltipMessage = "EXCLUSÃO DE TELEFONE (DDD/TELEFONE)";
-                break;
-            case 216:
-                $this->tooltipMessage = "ALTERAÇÃO DE FAX (DDD/FAX)";
-                break;
-            case 217:
-                $this->tooltipMessage = "EXCLUSÃO DE FAX (DDD/FAX)";
-                break;
-            case 218:
-                $this->tooltipMessage = "ALTERAÇÃO DE CORREIO ELETRÔNICO";
-                break;
-            case 219:
-                $this->tooltipMessage = "EXCLUSÃO DE CORREIO ELETRÔNICO";
-                break;
-            case 220:
-                $this->tooltipMessage = "ALTERAÇÃO DO NOME EMPRESARIAL (FIRMA OU DENOMINAÇÃO)";
-                break;
-            case 221:
-                $this->tooltipMessage = "ALTERAÇÃO DO TÍTULO DO ESTABELECIMENTO (NOME DE FANTASIA)";
-                break;
-            case 222:
-                $this->tooltipMessage = "ENQUADRAMENTO / REENQUADRAMENTO / DESENQUADRAMENTO DE ME/EPP";
-                break;
-            case 224:
-                $this->tooltipMessage = "ALTERAÇÃO DO CONTABILISTA RESPONSÁVEL PELA ORGANIZAÇÃO CONTÁBIL PERANTE O CRC";
-                break;
-            case 225:
-                $this->tooltipMessage = "ALTERAÇÃO DA NATUREZA JURÍDICA";
-                break;
-            case 230:
-                $this->tooltipMessage = "ALTERAÇÃO DA QUALIFICAÇÃO DA PESSOA FÍSICA RESPONSÁVEL PERANTE O CNPJ";
-                break;
-            case 232:
-                $this->tooltipMessage = "ALTERAÇÃO DO CONTABILISTA OU DA EMPRESA DE CONTABILIDADE";
-                break;
-            case 233:
-                $this->tooltipMessage = "EXCLUSÃO DO CONTABILISTA OU DA EMPRESA DE CONTABILIDADE";
-                break;
-            case 235:
-                $this->tooltipMessage = "ALTERAÇÃO DO ADMINISTRADOR DE EMPRESAS (FUNDOS/CLUBES E EQUIPARADAS)";
-                break;
-            case 237:
-                $this->tooltipMessage = "INDICAÇÃO DE PREPOSTO";
-                break;
-            case 238:
-                $this->tooltipMessage = "SUBSTITUIÇÃO DE PREPOSTO";
-                break;
-            case 239:
-                $this->tooltipMessage = "EXCLUSÃO DO PREPOSTO";
-                break;
-            case 240:
-                $this->tooltipMessage = "RENÚNCIA DO PREPOSTO";
-                break;
-            case 241:
-                $this->tooltipMessage = "EQUIPARAÇÃO, POR OPÇÃO, A ESTABELECIMENTO INDUSTRIAL";
-                break;
-            case 242:
-                $this->tooltipMessage = "DESISTÊNCIA DA EQUIPARAÇÃO, POR OPÇÃO, A ESTABELECIMENTO INDUSTRIAL";
-                break;
-            case 243:
-                $this->tooltipMessage = "ALTERAÇÃO DE ENDEREÇO DE PESSOA JURÍDICA DOMICILIADA NO EXTERIOR";
-                break;
-            case 244:
-                $this->tooltipMessage = "ALTERAÇÃO DE ATIVIDADES ECONOMICAS (PRINCIPAL E SECUNDÁRIAS)";
-                break;
-            case 246:
-                $this->tooltipMessage = "INDICAÇÃO DE ESTABELECIMENTO MATRIZ";
-                break;
-            case 247:
-                $this->tooltipMessage = "ALTERAÇÃO DE CAPITAL SOCIAL";
-                break;
-            case 248:
-                $this->tooltipMessage = "ALTERAÇÃO DO TIPO DE UNIDADE";
-                break;
-            case 249:
-                $this->tooltipMessage = "ALTERAÇÃO DA FORMA DE ATUAÇÃO";
-                break;
-            case 250:
-                $this->tooltipMessage = "ALTERAÇÃO DO VÍNCULO COM O IMÓVEL";
-                break;
-            case 251:
-                $this->tooltipMessage = "ALTERAÇÃO DA DATA DE VALIDADE DA INSCRIÇÃO";
-                break;
-            case 252:
-                $this->tooltipMessage = "ALTERAÇÃO DO NIRF";
-                break;
-            case 253:
-                $this->tooltipMessage = "ALTERAÇÃO DO PROPRIETÁRIO";
-                break;
-            case 254:
-                $this->tooltipMessage = "ALTERAÇÃO DO NOME EMPRESARIAL (ESPECÍFICO PARA PRODUTOR RURAL)";
-                break;
-            case 255:
-                $this->tooltipMessage = "EXCLUSÃO DE NIRE";
-                break;
-            case 256:
-                $this->tooltipMessage = "ALTERAÇÃO DA INSCRIÇÃO ESTADUAL ANTERIOR";
-                break;
-            case 257:
-                $this->tooltipMessage = "ALTERAÇÃO DO NÚMERO DE REGISTRO NO ÓRGÃO COMPETENTE";
-                break;
-            case 260:
-                $this->tooltipMessage = "ALTERAÇÃO/INCLUSÃO DE ENTE FEDERATIVO RESPONSÁVEL";
-                break;
-            case 261:
-                $this->tooltipMessage = "EXCLUSÃO DO NÚMERO DE REGISTRO NO ÓRGÃO COMPETENTE";
-                break;
-            case 262:
-                $this->tooltipMessage = "ALTERAÇÃO DA DEPENDÊNCIA ORÇAMENTÁRIA";
-                break;
-            case 263:
-                $this->tooltipMessage = "ALTERAÇÃO DO RESPONSÁVEL - PRODUTOR RURAL";
-                break;
-            case 264:
-                $this->tooltipMessage = "ALTERAÇÃO DE TIPO DE PRODUTOR RURAL (INDIVIDUAL OU SOCIEDADE)";
-                break;
-            case 265:
-                $this->tooltipMessage = "RENÚNCIA/ EXCLUSÃO DO REPRESENTANTE";
-                break;
-            case 266:
-                $this->tooltipMessage = "ATUALIZAÇÃO DE CEP DA PESSOA JURÍDICA";
-                break;
-            case 267:
-                $this->tooltipMessage = "INFORMAÇÕES DE BENEFICIÁRIO FINAL";
-                break;
-            case 268:
-                $this->tooltipMessage = "ALTERAÇÃO DO ENDEREÇO DE CORRESPONDÊNCIA";
-                break;
-            case 299:
-                $this->tooltipMessage = "ALTERAÇÃO DE DADOS ESPECÍFICOS";
-                break;
-            case 303:
-                $this->tooltipMessage = "EXCLUSÃO SIMPLES FEDERAL POR DÉBITO P/ COM FAZENDA NACIONAL OU PREVIDÊNCIA SOCIAL";
-                break;
-            case 304:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR ULTRAPASSAR OS LIMITES DE RECEITA BRUTA";
-                break;
-            case 305:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR TRANSFORMAÇÃO PARA A FORMA DE SOCIEDADE POR AÇÕES";
-                break;
-            case 306:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR EXERCÍCIO DE ATIVIDADE ECONÔMICA VEDADA";
-                break;
-            case 307:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR INGRESSO DE SÓCIO ESTRANGEIRO RESIDENTE NO EXTERIOR";
-                break;
-            case 308:
-                $this->tooltipMessage = "EXCLUSÃO SIMPLES FEDERAL POR TRANSF. FILIAL,SUC.,AG. OU REPRES. DE PJ COM SEDE NO EXTERIOR";
-                break;
-            case 309:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR PARTICIPAÇÃO NO CAPITAL DE OUTRA PESSOA JURÍDICA";
-                break;
-            case 310:
-                $this->tooltipMessage = "EXCLUSÃO SIMPLES FEDERAL POR EXIST. TITULAR/SÓCIO REALIZE GASTOS INCOMP. COM RENDIMENTOS DECLARADOS";
-                break;
-            case 311:
-                $this->tooltipMessage = "EXCLUSÃO SIMPLES FEDERAL POR PARTICIPAÇÃO DO TITULAR OU SÓCIO NO CAPITAL DE OUTRA EMPRESA";
-                break;
-            case 312:
-                $this->tooltipMessage = "EXCLUSÃO SIMPLES FEDERAL POR PARTICIPAÇÃO DE OUTRA PESSOA JURÍDICA NO CAPITAL DA EMPRESA";
-                break;
-            case 313:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR RECEITA DE VENDA DE BENS IMPORTADOS SUPERIOR AO LIMITE";
-                break;
-            case 314:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR PRÁTICA DE EMBARAÇO OU RESISTÊNCIA À FISCALIZAÇÃO";
-                break;
-            case 315:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL RETROATIVA À DATA DA OPÇÃO / ABERTURA";
-                break;
-            case 316:
-                $this->tooltipMessage = "ALTERAÇÃO DE TRIBUTOS DO SIMPLES FEDERAL";
-                break;
-            case 317:
-                $this->tooltipMessage = "DESFAZ EXCLUSÃO INDEVIDA";
-                break;
-            case 318:
-                $this->tooltipMessage = "DESFAZ INCLUSÃO INDEVIDA";
-                break;
-            case 319:
-                $this->tooltipMessage = "INCLUSÃO NO SIMPLES FEDERAL POR DECISÃO ADMINISTRATIVA";
-                break;
-            case 320:
-                $this->tooltipMessage = "INCLUSÃO NO SIMPLES FEDERAL POR MANDADO JUDICIAL";
-                break;
-            case 321:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR DECISÃO ADMINISTRATIVA";
-                break;
-            case 322:
-                $this->tooltipMessage = "EXCLUSÃO SIMPLES FEDERAL EMPRESA RESULTANTE CISÃO OU QUALQUER FORMA DE DESMEMBRAMENTO";
-                break;
-            case 325:
-                $this->tooltipMessage = "EXCLUSÃO DO SIMPLES FEDERAL POR INDUSTRIALIZAR BEBIDAS OU CIGARROS";
-                break;
-            case 327:
-                $this->tooltipMessage = "EVENTO DE ALTERAÇÃO DE PERÍODO DO SIMPLES NACIONAL";
-                break;
-            case 405:
-                $this->tooltipMessage = "DECRETAÇÃO DE FALÊNCIA";
-                break;
-            case 406:
-                $this->tooltipMessage = "REABILITAÇÃO DE FALÊNCIA";
-                break;
-            case 407:
-                $this->tooltipMessage = "ESPÓLIO DE EMPRESÁRIO, EMPRESA INDIVIDUAL IMOBILIÁRIA, EIRELI OU TITULAR DE EMPRESA UNIPESSOAL DE ADVOCACIA";
-                break;
-            case 408:
-                $this->tooltipMessage = "TÉRMINO DE LIQUIDAÇÃO";
-                break;
-            case 410:
-                $this->tooltipMessage = "INÍCIO DA INTERVENÇÃO";
-                break;
-            case 411:
-                $this->tooltipMessage = "ENCERRAMENTO DA INTERVENÇÃO";
-                break;
-            case 412:
-                $this->tooltipMessage = "INTERRUPÇÃO TEMPORÁRIA DE ATIVIDADES";
-                break;
-            case 413:
-                $this->tooltipMessage = "REINÍCIO DAS ATIVIDADES INTERROMPIDAS TEMPORARIAMENTE";
-                break;
-            case 414:
-                $this->tooltipMessage = "RESTABELECIMENTO DE INSCRIÇÃO DA ENTIDADE";
-                break;
-            case 415:
-                $this->tooltipMessage = "RESTABELECIMENTO DE INSCRIÇÃO DE FILIAL";
-                break;
-            case 416:
-                $this->tooltipMessage = "INÍCIO DE LIQUIDAÇÃO JUDICIAL";
-                break;
-            case 417:
-                $this->tooltipMessage = "INÍCIO DE LIQUIDAÇÃO EXTRAJUDICIAL";
-                break;
-            case 418:
-                $this->tooltipMessage = "RECUPERAÇÃO JUDICIAL";
-                break;
-            case 419:
-                $this->tooltipMessage = "ENCERRAMENTO DE RECUPERAÇÃO JUDICIAL";
-                break;
-            case 510:
-                $this->tooltipMessage = "EXTINÇÃO POR DETERMINAÇÃO JUDICIAL";
-                break;
-            case 514:
-                $this->tooltipMessage = "ANULAÇÃO DE INSCRIÇÃO INDEVIDA";
-                break;
-            case 516:
-                $this->tooltipMessage = "ANULAÇÃO POR VÍCIO";
-                break;
-            case 517:
-                $this->tooltipMessage = "PEDIDO DE BAIXA";
-                break;
-            case 518:
-                $this->tooltipMessage = "BAIXA - OMISSÃO CONTUMAZ";
-                break;
-            case 519:
-                $this->tooltipMessage = "BAIXA - INEXISTÊNCIA DE FATO";
-                break;
-            case 522:
-                $this->tooltipMessage = "BAIXA - INAPTIDÃO";
-                break;
-            case 523:
-                $this->tooltipMessage = "BAIXA - REGISTRO CANCELADO";
-                break;
-            case 601:
-                $this->tooltipMessage = "INSCRIÇÃO NO ESTADO";
-                break;
-            case 602:
-                $this->tooltipMessage = "INSCRIÇÃO DE SUBSTITUTO TRIBUTÁRIO NO ESTADO";
-                break;
-            case 603:
-                $this->tooltipMessage = "REATIVAÇÃO DA INSCRIÇÃO NO ESTADO";
-                break;
-            case 604:
-                $this->tooltipMessage = "PEDIDO DE BAIXA EXCLUSIVAMENTE NO ESTADO";
-                break;
-            case 605:
-                $this->tooltipMessage = "ALTERAÇÃO DO ENDEREÇO DE CORRESPONDÊNCIA";
-                break;
-            case 606:
-                $this->tooltipMessage = "INSCRIÇÃO NO ESTADO PARA ESTABELECIMENTO QUE ESTÁ LOCALIZADO EM OUTRO ESTADO, EXCETO SUBST. TRIB.";
-                break;
-            case 607:
-                $this->tooltipMessage = "PEDIDO DE BAIXA DE SUBSTITUTO TRIBUTÁRIO";
-                break;
-            case 608:
-                $this->tooltipMessage = "REATIVAÇÃO DE SUBSTITUTO TRIBUTÁRIO NO ESTADO";
-                break;
-            case 611:
-                $this->tooltipMessage = "ALTERAÇÃO DO REGIME DE APURAÇÃO NO ESTADO";
-                break;
-            case 612:
-                $this->tooltipMessage = "ALTERAÇÃO DE DADOS DA LICENÇA AMBIENTAL";
-                break;
-            case 613:
-                $this->tooltipMessage = "ALTERAÇÃO DA CONDIÇÃO DE SUBSTITUTO TRIBUTÁRIO";
-                break;
-            case 621:
-                $this->tooltipMessage = "ALTERAÇÃO DE CONDIÇÃO / REGIME DE APURAÇÃO";
-                break;
-            case 624:
-                $this->tooltipMessage = "ALTERAÇÃO DA LOCALIZAÇÃO";
-                break;
-            case 625:
-                $this->tooltipMessage = "OPÇÃO OU EXCLUSÃO DA INSCRIÇÃO ÚNICA";
-                break;
-            case 626:
-                $this->tooltipMessage = "INCLUSÃO DE ESTABELECIMENTO DA INSCRIÇÃO ÚNICA";
-                break;
-            case 627:
-                $this->tooltipMessage = "EXCLUSÃO DE ESTABELECIMENTO DA INSCRIÇÃO ÚNICA";
-                break;
-            case 628:
-                $this->tooltipMessage = "ALTERAÇÃO DO TIPO DE CONTRIBUINTE";
-                break;
-            case 629:
-                $this->tooltipMessage = "ALTERAÇÃO DA OPÇÃO POR LIVROS/DOCUMENTOS ELETRÔNICOS";
-                break;
-            case 630:
-                $this->tooltipMessage = "ALTERAÇÃO DA PERMANÊNCIA DE LIVROS FISCAIS";
-                break;
-            case 632:
-                $this->tooltipMessage = "ALTERAÇÃO DO TIPO DE CONVÊNIO / PROTOCOLO DE SUBSTITUIÇÃO TRIBUTÁRIA";
-                break;
-            case 633:
-                $this->tooltipMessage = "ALTERAÇÃO DO PROCURADOR NO ESTADO";
-                break;
-            case 701:
-                $this->tooltipMessage = "ALTERAÇÃO DO ENDEREÇO RESIDENCIAL (EVENTO EXCLUSIVO DO MEI)";
-                break;
-            case 702:
-                $this->tooltipMessage = "ALTERAÇÃO DO REGISTRO DE IDENTIDADE (EVENTO EXCLUSIVO DO MEI)";
-                break;
-            case 703:
-                $this->tooltipMessage = "ALTERAÇÃO DO CÓDIGO DE OCUPAÇÃO (PRINCIPAL E SECUNDÁRIO) (EVENTO EXCLUSIVO DO MEI)";
-                break;
-            case 801:
-                $this->tooltipMessage = "INSCRIÇÃO NO MUNICÍPIO";
-                break;
-            case 802:
-                $this->tooltipMessage = "INSCRIÇÃO MUNICIPAL VINCULADA A CNPJ JÁ CADASTRADO PARA OUTRO ESTABELECIMENTO";
-                break;
-            case 803:
-                $this->tooltipMessage = "INSCRIÇÃO PARA ESTABELECIMENTO SEDIADO EM OUTRO MUNICÍPIO";
-                break;
-            case 804:
-                $this->tooltipMessage = "PEDIDO DE BAIXA EXCLUSIVAMENTE NO MUNICÍPIO";
-                break;
-            case 805:
-                $this->tooltipMessage = "CORREÇÃO DO NÚMERO DE INSCRIÇÃO IMOBILIÁRIA";
-                break;
-            case 806:
-                $this->tooltipMessage = "ALTERAÇÃO DE ÁREA";
-                break;
-            case 808:
-                $this->tooltipMessage = "RENOVAÇÃO DO TVL (ALVARÁ)";
-                break;
-            case 809:
-                $this->tooltipMessage = "INFORMAÇÃO DE CÓDIGO DE ANÚNCIO";
-                break;
-            case 810:
-                $this->tooltipMessage = "INSCRIÇÃO NO MUNICÍPIO DE SÃO PAULO PARA ESTABELECIMENTO SEDIADO EM OUTRO MUNICÍPIO";
-                break;
-            case 811:
-                $this->tooltipMessage = "INFORMAÇÃO DO NÚMERO CCM CENTRALIZADOR";
-                break;
-            case 812:
-                $this->tooltipMessage = "ALTERAÇÃO DO ENDEREÇO DO ESTABELECIMENTO VINCULADO";
-                break;
-            case 813:
-                $this->tooltipMessage = "ALTERAÇÃO DO TELEFONE DO ESTABELECIMENTO VINCULADO";
-                break;
-            case 814:
-                $this->tooltipMessage = "ALTERAÇÃO DO REGIME DE TRIBUTAÇÃO";
-                break;
-            case 850:
-                $this->tooltipMessage = "ALVARÁ MUNICIPAL";
-                break;
-            case 851:
-                $this->tooltipMessage = "ALVARÁ SANITÁRIO MUNICIPAL";
-                break;
-            case 852:
-                $this->tooltipMessage = "ALVARÁ DO MEIO AMBIENTE MUNICIPAL";
-                break;
-            case 853:
-                $this->tooltipMessage = "LICENCIAMENTO DE TRANSPORTES";
-                break;
-            case 854:
-                $this->tooltipMessage = "ALVARÁ AGRÍCULA MUNICIPAL";
-                break;
-            case 855:
-                $this->tooltipMessage = "ALVARÁ DE EDUCAÇÃO MUNICIPAL";
-                break;
-            case 856:
-                $this->tooltipMessage = "ALVARÁ DE BRIGADA MUNICIPAL";
-                break;
-            case 901:
-                $this->tooltipMessage = "INCLUSÃO DE CNPJ - MATRIZ OU FILIAL";
-                break;
-            case 902:
-                $this->tooltipMessage = "INSCRIÇÃO DE ESTABELECIMENTO POR DETERMINAÇÃO JUDICIAL";
-                break;
-            case 906:
-                $this->tooltipMessage = "ANULAÇÃO POR MULTIPLICIDADE DE INSCRIÇÃO";
-                break;
-            case 909:
-                $this->tooltipMessage = "RESTAURAÇÃO DA SITUAÇÃO CADASTRAL ANTERIOR";
-                break;
-            case 910:
-                $this->tooltipMessage = "ALTERAÇÃO DE DATA DE ABERTURA";
-                break;
-            case 912:
-                $this->tooltipMessage = "SUSPENSÃO - BAIXA RECEPCIONADA (EM ANÁLISE)";
-                break;
-            case 913:
-                $this->tooltipMessage = "SUSPENSÃO - BAIXA INDEFERIDA";
-                break;
-            case 915:
-                $this->tooltipMessage = "SUSPENSÃO - INEXISTÊNCIA DE FATO";
-                break;
-            case 916:
-                $this->tooltipMessage = "INAPTIDÃO - INEXISTÊNCIA DE FATO";
-                break;
-            case 922:
-                $this->tooltipMessage = "DESFAZ INAPTIDÃO POR DETERMINAÇÃO JUDICIAL";
-                break;
-            case 923:
-                $this->tooltipMessage = "ALTERAÇÃO DE DATA DE PUBLICAÇÃO / DATA DE EFEITO";
-                break;
-            case 924:
-                $this->tooltipMessage = "CORREÇÃO DA DATA DE BAIXA";
-                break;
-            case 926:
-                $this->tooltipMessage = "DESFAZ CISÃO PARCIAL";
-                break;
-            case 927:
-                $this->tooltipMessage = "SUSPENSÃO - INDÍCIO DE INTERPOSIÇÃO FRAUDULENTA";
-                break;
-            case 928:
-                $this->tooltipMessage = "SUSPENSÃO - FALTA DE PLURALIDADE DE SÓCIOS";
-                break;
-            case 929:
-                $this->tooltipMessage = "CORREÇÃO DA DATA DE RESPONSABILIDADE";
-                break;
-            case 938:
-                $this->tooltipMessage = "SUSPENSÃO - DETERMINAÇÃO JUDICIAL";
-                break;
-            case 939:
-                $this->tooltipMessage = "INAPTIDÃO - OMISSÃO DE DECLARAÇÕES";
-                break;
-            case 940:
-                $this->tooltipMessage = "INAPTIDÃO - LOCALIZAÇÃO DESCONHECIDA";
-                break;
-            case 941:
-                $this->tooltipMessage = "SUBSTITUIÇÃO/ELIMINAÇÃO DO REGISTRO DE RESPONSABILIDADE";
-                break;
-            case 942:
-                $this->tooltipMessage = "SUSPENSÃO – INCONSISTÊNCIA CADASTRAL";
-                break;
-            case 990:
-                $this->tooltipMessage = "CORREÇÃO DE DADOS CADASTRAIS NO ÓRGÃO DE REGISTRO";
-                break;
-            case 9001:
-                $this->tooltipMessage = "ALTERAÇÃO DO NOME EMPRESARIAL";
-                break;
-            case 9002:
-                $this->tooltipMessage = "ALTERAÇÃO DA NATUREZA JURÍDICA";
-                break;
-            case 9003:
-                $this->tooltipMessage = "ALTERAÇÃO DO NOME FANTASIA";
-                break;
-            case 9004:
-                $this->tooltipMessage = "ALTERAÇÃO DO CAPITAL SOCIAL";
-                break;
-            case 9005:
-                $this->tooltipMessage = "ALTERAÇÃO DO CAPITAL INTEGRALIZADO";
-                break;
-            case 9006:
-                $this->tooltipMessage = "ALTERAÇÃO DO OBJETO SOCIAL";
-                break;
-            case 9007:
-                $this->tooltipMessage = "ALTERAÇÃO DOS DADOS DO CONTATO";
-                break;
-            case 9008:
-                $this->tooltipMessage = "ALTERAÇÃO DE EMAIL";
-                break;
-            case 9009:
-                $this->tooltipMessage = "ALTERAÇÃO DA SITUAÇÃO DO ESTABELECIMENTO";
-                break;
-            case 9010:
-                $this->tooltipMessage = "ALTERAÇÃO DE ENDEREÇO";
-                break;
-            case 9011:
-                $this->tooltipMessage = "ALTERAÇÃO DE ATIVIDADES ECONÔMICAS";
-                break;
-            case 9012:
-                $this->tooltipMessage = "ALTERAÇÃO DE DADOS DO SÓCIO/REPRESENTANTE";
-                break;
-            case 9013:
-                $this->tooltipMessage = "ALTERAÇÃO DE PORTE EMPRESARIAL";
-                break;
-            case 994:
-                $this->tooltipMessage = "INSCRIÇÃO IAGRO";
-                break;
-            case 995:
-                $this->tooltipMessage = "INSCRIÇÃO SUFRAMA";
-                break;
-            case 996:
-                $this->tooltipMessage = "INSCRIÇÃO MEIO AMBIENTE";
-                break;
-            case 997:
-                $this->tooltipMessage = "INSCRIÇÃO BOMBEIROS";
-                break;
-            case 998:
-                $this->tooltipMessage = "INSCRIÇÃO VIGILÂNCIA SANITÁRIA";
-                break;
-            case 999:
-                $this->tooltipMessage = "LICENCIAMENTO DE ESTABELECIMENTO ANTERIORMENTE REGISTRADO (LEGADO)";
-                break;
-            default:
-                $this->tooltipMessage = "Código de evento não encontrado.";
-                break;
-        }
+        // Mapeamento de códigos de evento para mensagens
+        $eventos = [
+            '001'=>'ENTRADA DE SÓCIO/ADMINISTRADOR',
+            '002'=>'ALTERAÇÃO DA DATA DE INCLUSÃO',
+            '003'=>'ALTERAÇÃO DE DADOS DO SÓCIO/ADMINISTRADOR',
+            '005'=>'SAÍDA DE SÓCIO/ADMINISTRADOR',
+            '006'=>'ALTERAÇÃO DA DATA DE EXCLUSÃO',
+            '007'=>'ALTERAÇÃO DA DATA DE INCLUSÃO DE SÓCIO/ADMINISTRADOR EXCLUÍDO',
+            '008'=>'EXCLUSÃO DE REGISTRO DE SÓCIO/ADMINISTRADOR',
+            '010'=>'INFORMAÇÃO DE SÓCIO PARA CONFERÊNCIA COM A BASE CNPJ',
+            '011'=>'ENTRADA DO BENEFICIÁRIO FINAL',
+            '012'=>'ALTERAÇÃO DE DADOS DO BENEFICIÁRIO FINAL',
+            '013'=>'SAÍDA DO BENEFICIÁRIO FINAL',
+            '052'=>'REATIVAÇÃO - ARTIGO 60 LEI 8.934/94',
+            '101'=>'INSCRIÇÃO DE PRIMEIRO ESTABELECIMENTO',
+            '102'=>'INSCRIÇÃO DOS DEMAIS ESTABELECIMENTOS',
+            '103'=>'INSCRIÇÃO DE ESTABELECIMENTO FILIAL DE EMPRESA BRASILEIRA NO EXTERIOR',
+            '105'=>'INSCRIÇÃO DE EMBAIXADA/CONSULADO/REPRESENTAÇÕES DO GOVERNO NO EXTERIOR',
+            '106'=>'INSCRIÇÃO DE MISSÕES DIPL./REPART. CONSUL./REPRES. DE ÓRGÃOS INTERNACIONAIS',
+            '107'=>'INSCRIÇÃO DE PESSOA JURÍDICA DOMICILIADA NO EXTERIOR',
+            '109'=>'INSCRIÇÃO DE INCORPORAÇÃO IMOBILIÁRIA (PATRIMÔNIO DE AFETAÇÃO)',
+            '110'=>'INSCRIÇÃO DE PRODUTOR RURAL (PRIMEIRO ESTABELECIMENTO)',
+            '204'=>'CISÃO PARCIAL (ESPECÍFICO PARA A SUCEDIDA)',
+            '206'=>"DESCLASSIFICAÇÃO COMO ESTABELECIMENTO UNIFICADOR",
+            '209'=>"ALTERAÇÃO DE ENDEREÇO ENTRE MUNICÍPIOS DENTRO DO MESMO ESTADO",
+            '210'=>"ALTERAÇÃO DE ENDEREÇO ENTRE ESTADOS",
+            '211'=>"ALTERAÇÃO DE ENDEREÇO DENTRO DO MESMO MUNICÍPIO",
+            '214'=>"ALTERAÇÃO DE TELEFONE (DDD/TELEFONE)",
+            '215'=>"EXCLUSÃO DE TELEFONE (DDD/TELEFONE)",
+            '216'=>"ALTERAÇÃO DE FAX (DDD/FAX)",
+            '217'=>"EXCLUSÃO DE FAX (DDD/FAX)",
+            '218'=>"ALTERAÇÃO DE CORREIO ELETRÔNICO",
+            '219'=>"EXCLUSÃO DE CORREIO ELETRÔNICO",
+            '220'=>"ALTERAÇÃO DO NOME EMPRESARIAL (FIRMA OU DENOMINAÇÃO)",
+            '221'=>"ALTERAÇÃO DO TÍTULO DO ESTABELECIMENTO (NOME DE FANTASIA)",
+            '222'=>"ENQUADRAMENTO / REENQUADRAMENTO / DESENQUADRAMENTO DE ME/EPP",
+            '224'=>"ALTERAÇÃO DO CONTABILISTA RESPONSÁVEL PELA ORGANIZAÇÃO CONTÁBIL PERANTE O CRC",
+            '225'=>"ALTERAÇÃO DA NATUREZA JURÍDICA",
+            '230'=>"ALTERAÇÃO DA QUALIFICAÇÃO DA PESSOA FÍSICA RESPONSÁVEL PERANTE O CNPJ",
+            '232'=>"ALTERAÇÃO DO CONTABILISTA OU DA EMPRESA DE CONTABILIDADE",
+            '233'=>"EXCLUSÃO DO CONTABILISTA OU DA EMPRESA DE CONTABILIDADE",
+            '235'=>"ALTERAÇÃO DO ADMINISTRADOR DE EMPRESAS (FUNDOS/CLUBES E EQUIPARADAS)",
+            '237'=>"INDICAÇÃO DE PREPOSTO",
+            '238'=>"SUBSTITUIÇÃO DE PREPOSTO",
+            '239'=>"EXCLUSÃO DO PREPOSTO",
+            '240'=>"RENÚNCIA DO PREPOSTO",
+            '241'=>"EQUIPARAÇÃO, POR OPÇÃO, A ESTABELECIMENTO INDUSTRIAL",
+            '242'=>"DESISTÊNCIA DA EQUIPARAÇÃO, POR OPÇÃO, A ESTABELECIMENTO INDUSTRIAL",
+            '243'=>"ALTERAÇÃO DE ENDEREÇO DE PESSOA JURÍDICA DOMICILIADA NO EXTERIOR",
+            '244'=>"ALTERAÇÃO DE ATIVIDADES ECONOMICAS (PRINCIPAL E SECUNDÁRIAS)",
+            '246'=>"INDICAÇÃO DE ESTABELECIMENTO MATRIZ",
+            '247'=>"ALTERAÇÃO DE CAPITAL SOCIAL",
+            '248'=>"ALTERAÇÃO DO TIPO DE UNIDADE",
+            '249'=>"ALTERAÇÃO DA FORMA DE ATUAÇÃO",
+            '250'=>"ALTERAÇÃO DO VÍNCULO COM O IMÓVEL",
+            '251'=>"ALTERAÇÃO DA DATA DE VALIDADE DA INSCRIÇÃO",
+            '252'=>"ALTERAÇÃO DO NIRF",
+            '253'=>"ALTERAÇÃO DO PROPRIETÁRIO",
+            '254'=>"ALTERAÇÃO DO NOME EMPRESARIAL (ESPECÍFICO PARA PRODUTOR RURAL)",
+            '255'=>"EXCLUSÃO DE NIRE",
+            '256'=>"ALTERAÇÃO DA INSCRIÇÃO ESTADUAL ANTERIOR",
+            '257'=>"ALTERAÇÃO DO NÚMERO DE REGISTRO NO ÓRGÃO COMPETENTE",
+            '260'=>"ALTERAÇÃO/INCLUSÃO DE ENTE FEDERATIVO RESPONSÁVEL",
+            '261'=>"EXCLUSÃO DO NÚMERO DE REGISTRO NO ÓRGÃO COMPETENTE",
+            '262'=>"ALTERAÇÃO DA DEPENDÊNCIA ORÇAMENTÁRIA",
+            '263'=>"ALTERAÇÃO DO RESPONSÁVEL - PRODUTOR RURAL",
+            '264'=>"ALTERAÇÃO DE TIPO DE PRODUTOR RURAL (INDIVIDUAL OU SOCIEDADE)",
+            '265'=>"RENÚNCIA/ EXCLUSÃO DO REPRESENTANTE",
+            '266'=>"ATUALIZAÇÃO DE CEP DA PESSOA JURÍDICA",
+            '267'=>"INFORMAÇÕES DE BENEFICIÁRIO FINAL",
+            '268'=>"ALTERAÇÃO DO ENDEREÇO DE CORRESPONDÊNCIA",
+            '299'=>"ALTERAÇÃO DE DADOS ESPECÍFICOS",
+            '303'=>"EXCLUSÃO SIMPLES FEDERAL POR DÉBITO P/ COM FAZENDA NACIONAL OU PREVIDÊNCIA SOCIAL",
+            '304'=>"EXCLUSÃO DO SIMPLES FEDERAL POR ULTRAPASSAR OS LIMITES DE RECEITA BRUTA",
+            '305'=>"EXCLUSÃO DO SIMPLES FEDERAL POR TRANSFORMAÇÃO PARA A FORMA DE SOCIEDADE POR AÇÕES",
+            '306'=>"EXCLUSÃO DO SIMPLES FEDERAL POR EXERCÍCIO DE ATIVIDADE ECONÔMICA VEDADA",
+            '307'=>"EXCLUSÃO DO SIMPLES FEDERAL POR INGRESSO DE SÓCIO ESTRANGEIRO RESIDENTE NO EXTERIOR",
+            '308'=>"EXCLUSÃO SIMPLES FEDERAL POR TRANSF. FILIAL,SUC.,AG. OU REPRES. DE PJ COM SEDE NO EXTERIOR",
+            '309'=>"EXCLUSÃO DO SIMPLES FEDERAL POR PARTICIPAÇÃO NO CAPITAL DE OUTRA PESSOA JURÍDICA",
+            '310'=>"EXCLUSÃO SIMPLES FEDERAL POR EXIST. TITULAR/SÓCIO REALIZE GASTOS INCOMP. COM RENDIMENTOS DECLARADOS",
+            '311'=>"EXCLUSÃO SIMPLES FEDERAL POR PARTICIPAÇÃO DO TITULAR OU SÓCIO NO CAPITAL DE OUTRA EMPRESA",
+            '312'=>"EXCLUSÃO SIMPLES FEDERAL POR PARTICIPAÇÃO DE OUTRA PESSOA JURÍDICA NO CAPITAL DA EMPRESA",
+            '313'=>"EXCLUSÃO DO SIMPLES FEDERAL POR RECEITA DE VENDA DE BENS IMPORTADOS SUPERIOR AO LIMITE",
+            '314'=>"EXCLUSÃO DO SIMPLES FEDERAL POR PRÁTICA DE EMBARAÇO OU RESISTÊNCIA À FISCALIZAÇÃO",
+            '315'=>"EXCLUSÃO DO SIMPLES FEDERAL RETROATIVA À DATA DA OPÇÃO / ABERTURA",
+            '316'=>"ALTERAÇÃO DE TRIBUTOS DO SIMPLES FEDERAL",
+            '317'=>"DESFAZ EXCLUSÃO INDEVIDA",
+            '318'=>"DESFAZ INCLUSÃO INDEVIDA",
+            '319'=>"INCLUSÃO NO SIMPLES FEDERAL POR DECISÃO ADMINISTRATIVA",
+            '320'=>"INCLUSÃO NO SIMPLES FEDERAL POR MANDADO JUDICIAL",
+            '321'=>"EXCLUSÃO DO SIMPLES FEDERAL POR DECISÃO ADMINISTRATIVA",
+            '322'=>"EXCLUSÃO SIMPLES FEDERAL EMPRESA RESULTANTE CISÃO OU QUALQUER FORMA DE DESMEMBRAMENTO",
+            '325'=>"EXCLUSÃO DO SIMPLES FEDERAL POR INDUSTRIALIZAR BEBIDAS OU CIGARROS",
+            '327'=>"EVENTO DE ALTERAÇÃO DE PERÍODO DO SIMPLES NACIONAL",
+            '405'=>"DECRETAÇÃO DE FALÊNCIA",
+            '406'=>"REABILITAÇÃO DE FALÊNCIA",
+            '407'=>"ESPÓLIO DE EMPRESÁRIO, EMPRESA INDIVIDUAL IMOBILIÁRIA, EIRELI OU TITULAR DE EMPRESA UNIPESSOAL DE ADVOCACIA",
+            '408'=>"TÉRMINO DE LIQUIDAÇÃO",
+            '410'=>"INÍCIO DA INTERVENÇÃO",
+            '411'=>"ENCERRAMENTO DA INTERVENÇÃO",
+            '412'=>"INTERRUPÇÃO TEMPORÁRIA DE ATIVIDADES",
+            '413'=>"REINÍCIO DAS ATIVIDADES INTERROMPIDAS TEMPORARIAMENTE",
+            '414'=>"RESTABELECIMENTO DE INSCRIÇÃO DA ENTIDADE",
+            '415'=>"RESTABELECIMENTO DE INSCRIÇÃO DE FILIAL",
+            '416'=>"INÍCIO DE LIQUIDAÇÃO JUDICIAL",
+            '417'=>"INÍCIO DE LIQUIDAÇÃO EXTRAJUDICIAL",
+            '418'=>"RECUPERAÇÃO JUDICIAL",
+            '419'=>"ENCERRAMENTO DE RECUPERAÇÃO JUDICIAL",
+            '510'=>"EXTINÇÃO POR DETERMINAÇÃO JUDICIAL",
+            '514'=>"ANULAÇÃO DE INSCRIÇÃO INDEVIDA",
+            '516'=>"ANULAÇÃO POR VÍCIO",
+            '517'=>"PEDIDO DE BAIXA",
+            '518'=>"BAIXA - OMISSÃO CONTUMAZ",
+            '519'=>"BAIXA - INEXISTÊNCIA DE FATO",
+            '522'=>"BAIXA - INAPTIDÃO",
+            '523'=>"BAIXA - REGISTRO CANCELADO",
+            '601'=>"INSCRIÇÃO NO ESTADO",
+            '602'=>"INSCRIÇÃO DE SUBSTITUTO TRIBUTÁRIO NO ESTADO",
+            '603'=>"REATIVAÇÃO DA INSCRIÇÃO NO ESTADO",
+            '604'=>"PEDIDO DE BAIXA EXCLUSIVAMENTE NO ESTADO",
+            '605'=>"ALTERAÇÃO DO ENDEREÇO DE CORRESPONDÊNCIA",
+            '606'=>"INSCRIÇÃO NO ESTADO PARA ESTABELECIMENTO QUE ESTÁ LOCALIZADO EM OUTRO ESTADO, EXCETO SUBST. TRIB.",
+            '607'=>"PEDIDO DE BAIXA DE SUBSTITUTO TRIBUTÁRIO",
+            '608'=>"REATIVAÇÃO DE SUBSTITUTO TRIBUTÁRIO NO ESTADO",
+            '611'=>"ALTERAÇÃO DO REGIME DE APURAÇÃO NO ESTADO",
+            '612'=>"ALTERAÇÃO DE DADOS DA LICENÇA AMBIENTAL",
+            '613'=>"ALTERAÇÃO DA CONDIÇÃO DE SUBSTITUTO TRIBUTÁRIO",
+            '621'=>"ALTERAÇÃO DE CONDIÇÃO / REGIME DE APURAÇÃO",
+            '624'=>"ALTERAÇÃO DA LOCALIZAÇÃO",
+            '625'=>"OPÇÃO OU EXCLUSÃO DA INSCRIÇÃO ÚNICA",
+            '626'=>"INCLUSÃO DE ESTABELECIMENTO DA INSCRIÇÃO ÚNICA",
+            '627'=>"EXCLUSÃO DE ESTABELECIMENTO DA INSCRIÇÃO ÚNICA",
+            '628'=>"ALTERAÇÃO DO TIPO DE CONTRIBUINTE",
+            '629'=>"ALTERAÇÃO DA OPÇÃO POR LIVROS/DOCUMENTOS ELETRÔNICOS",
+            '630'=>"ALTERAÇÃO DA PERMANÊNCIA DE LIVROS FISCAIS",
+            '632'=>"ALTERAÇÃO DO TIPO DE CONVÊNIO / PROTOCOLO DE SUBSTITUIÇÃO TRIBUTÁRIA",
+            '633'=>"ALTERAÇÃO DO PROCURADOR NO ESTADO",
+            '701'=>"ALTERAÇÃO DO ENDEREÇO RESIDENCIAL (EVENTO EXCLUSIVO DO MEI)",
+            '702'=>"ALTERAÇÃO DO REGISTRO DE IDENTIDADE (EVENTO EXCLUSIVO DO MEI)",
+            '703'=>"ALTERAÇÃO DO CÓDIGO DE OCUPAÇÃO (PRINCIPAL E SECUNDÁRIO) (EVENTO EXCLUSIVO DO MEI)",
+            '801'=>"INSCRIÇÃO NO MUNICÍPIO",
+            '802'=>"INSCRIÇÃO MUNICIPAL VINCULADA A CNPJ JÁ CADASTRADO PARA OUTRO ESTABELECIMENTO",
+            '803'=>"INSCRIÇÃO PARA ESTABELECIMENTO SEDIADO EM OUTRO MUNICÍPIO",
+            '804'=>"PEDIDO DE BAIXA EXCLUSIVAMENTE NO MUNICÍPIO",
+            '805'=>"CORREÇÃO DO NÚMERO DE INSCRIÇÃO IMOBILIÁRIA",
+            '806'=>"ALTERAÇÃO DE ÁREA",
+            '808'=>"RENOVAÇÃO DO TVL (ALVARÁ)",
+            '809'=>"INFORMAÇÃO DE CÓDIGO DE ANÚNCIO",
+            '810'=>"INSCRIÇÃO NO MUNICÍPIO DE SÃO PAULO PARA ESTABELECIMENTO SEDIADO EM OUTRO MUNICÍPIO",
+            '811'=>"INFORMAÇÃO DO NÚMERO CCM CENTRALIZADOR",
+            '812'=>"ALTERAÇÃO DO ENDEREÇO DO ESTABELECIMENTO VINCULADO",
+            '813'=>"ALTERAÇÃO DO TELEFONE DO ESTABELECIMENTO VINCULADO",
+            '814'=>"ALTERAÇÃO DO REGIME DE TRIBUTAÇÃO",
+            '850'=>"ALVARÁ MUNICIPAL",
+            '851'=>"ALVARÁ SANITÁRIO MUNICIPAL",
+            '852'=>"ALVARÁ DO MEIO AMBIENTE MUNICIPAL",
+            '853'=>"LICENCIAMENTO DE TRANSPORTES",
+            '854'=>"ALVARÁ AGRÍCULA MUNICIPAL",
+            '855'=>"ALVARÁ DE EDUCAÇÃO MUNICIPAL",
+            '856'=>"ALVARÁ DE BRIGADA MUNICIPAL",
+            '901'=>"INCLUSÃO DE CNPJ - MATRIZ OU FILIAL",
+            '902'=>"INSCRIÇÃO DE ESTABELECIMENTO POR DETERMINAÇÃO JUDICIAL",
+            '906'=>"ANULAÇÃO POR MULTIPLICIDADE DE INSCRIÇÃO",
+            '909'=>"RESTAURAÇÃO DA SITUAÇÃO CADASTRAL ANTERIOR",
+            '910'=>"ALTERAÇÃO DE DATA DE ABERTURA",
+            '912'=>"SUSPENSÃO - BAIXA RECEPCIONADA (EM ANÁLISE)",
+            '913'=>"SUSPENSÃO - BAIXA INDEFERIDA",
+            '915'=>"SUSPENSÃO - INEXISTÊNCIA DE FATO",
+            '916'=>"INAPTIDÃO - INEXISTÊNCIA DE FATO",
+            '922'=>"DESFAZ INAPTIDÃO POR DETERMINAÇÃO JUDICIAL",
+            '923'=>"ALTERAÇÃO DE DATA DE PUBLICAÇÃO / DATA DE EFEITO",
+            '924'=>"CORREÇÃO DA DATA DE BAIXA",
+            '926'=>"DESFAZ CISÃO PARCIAL",
+            '927'=>"SUSPENSÃO - INDÍCIO DE INTERPOSIÇÃO FRAUDULENTA",
+            '928'=>"SUSPENSÃO - FALTA DE PLURALIDADE DE SÓCIOS",
+            '929'=>"CORREÇÃO DA DATA DE RESPONSABILIDADE",
+            '938'=>"SUSPENSÃO - DETERMINAÇÃO JUDICIAL",
+            '939'=>"INAPTIDÃO - OMISSÃO DE DECLARAÇÕES",
+            '940'=>"INAPTIDÃO - LOCALIZAÇÃO DESCONHECIDA",
+            '941'=>"SUBSTITUIÇÃO/ELIMINAÇÃO DO REGISTRO DE RESPONSABILIDADE",
+            '942'=>"SUSPENSÃO – INCONSISTÊNCIA CADASTRAL",
+            '990'=>"CORREÇÃO DE DADOS CADASTRAIS NO ÓRGÃO DE REGISTRO",
+            '9001'=>"ALTERAÇÃO DO NOME EMPRESARIAL",
+            '9002'=>"ALTERAÇÃO DA NATUREZA JURÍDICA",
+            '9003'=>"ALTERAÇÃO DO NOME FANTASIA",
+            '9004'=>"ALTERAÇÃO DO CAPITAL SOCIAL",
+            '9005'=>"ALTERAÇÃO DO CAPITAL INTEGRALIZADO",
+            '9006'=>"ALTERAÇÃO DO OBJETO SOCIAL",
+            '9007'=>"ALTERAÇÃO DOS DADOS DO CONTATO",
+            '9008'=>"ALTERAÇÃO DE EMAIL",
+            '9009'=>"ALTERAÇÃO DA SITUAÇÃO DO ESTABELECIMENTO",
+            '9010'=>"ALTERAÇÃO DE ENDEREÇO",
+            '9011'=>"ALTERAÇÃO DE ATIVIDADES ECONÔMICAS",
+            '9012'=>"ALTERAÇÃO DE DADOS DO SÓCIO/REPRESENTANTE",
+            '9013'=>"ALTERAÇÃO DE PORTE EMPRESARIAL",
+            '994'=>"INSCRIÇÃO IAGRO",
+            '995'=>"INSCRIÇÃO SUFRAMA",
+            '996'=>"INSCRIÇÃO MEIO AMBIENTE",
+            '997'=>"INSCRIÇÃO BOMBEIROS",
+            '998'=>"INSCRIÇÃO VIGILÂNCIA SANITÁRIA",
+            '999'=>"LICENCIAMENTO DE ESTABELECIMENTO ANTERIORMENTE REGISTRADO (LEGADO)",
+        ];
+            // Verificar se o código do evento existe no array
+            $this->tooltipMessage = $eventos[$codEvento] ?? 'Código de evento desconhecido';
     }
 
     public function esconderTooltip()
@@ -688,6 +305,7 @@ class EstabelecimentosTable extends Component
 
     public function render()
     {
+    
         return view('livewire.estabelecimentos-table');
     }
 }

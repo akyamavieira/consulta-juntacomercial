@@ -1,24 +1,39 @@
-<div wire:poll.300000ms="atualizarEstabelecimentos">
-    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow">
+<div wire:poll.300000ms="atualizarEstabelecimentos" class="flex items-center justify-center">
+    <table class="border border-gray-200 rounded-3xl overflow-hidden">
         <thead>
             <tr class="bg-gray-100 text-left">
-                <th class="px-6 py-3 text-sm font-medium text-gray-600">Empresa</th>
-                <th class="px-6 py-3 text-sm font-medium text-gray-600">Responsável</th>
-                <th class="px-6 py-3 text-sm font-medium text-gray-600">Ação</th>
+                <th class="px-3 py-3 text-sm font-medium text-gray-600">Empresa</th>
+                <th class="px-3 py-3 text-sm font-medium text-gray-600">Responsável</th>
+                <th class="px-3 py-3 text-sm font-medium text-gray-600 max-w-14">Status</th>
+                <th class="px-3 py-3 text-sm font-medium text-gray-600 max-w-14">Ação</th>
             </tr>
         </thead>
         <tbody>
             @foreach($estabelecimentos['registrosRedesim']['registroRedesim'] as $estabelecimento)
                 <tr class="border-t">
-                    <td class="px-6 py-4 text-sm text-gray-800">
-                        {{ $estabelecimento['dadosRedesim']['nomeEmpresarial'] }}
+                    <td class="px-3 py-3 text-sm text-gray-800 max-w-36 md:max-w-full">
+                        {{$estabelecimento['dadosRedesim']['nomeEmpresarial'] }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-800">
+                    <td class="px-3 py-3 text-sm text-gray-800 max-w-28 md:max-w-full">
                         {{ $estabelecimento['dadosRedesim']['responsavelPeranteCnpj']['nomeResponsavel'] }}
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-3 py-3 text-sm text-gray-800 relative">
+                        <span
+                            wire:mouseover="mostrarTooltip('{{ $estabelecimento['identificador'] }}','{{ $estabelecimento["eventos"]["evento"]["0"]["codEvento"] }}')"
+                            wire:mouseout="esconderTooltip" class="cursor-pointer">
+                            {{ $estabelecimento["eventos"]["evento"]["0"]["codEvento"] }}
+                        </span>
+                        @if($tooltipIdentificador === $estabelecimento['identificador'])
+                            <div class="absolute z-10 mt-1 p-2 bg-gray-800 text-white text-sm rounded shadow-lg">
+                                {{ $tooltipMessage }}
+                            </div>
+                        @endif
+                    </td>
+                    <td class="px-3 py-3">
                         <button wire:click="mostrarDetalhes('{{ $estabelecimento['identificador'] }}')"
-                            class="text-blue-500 hover:text-blue-700">Ver Detalhes</button>
+                            class="text-blue-500 hover:text-blue-700"><img src="{{ asset('img/ver-detalhes.svg') }}"
+                                alt="Ver Detalhes" class="h-5 w-5 text-blue-500" />
+                        </button>
                     </td>
                 </tr>
             @endforeach
@@ -28,7 +43,7 @@
     <!-- Modal -->
     @if($mostrarModal)
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full sm:w-2/3 md:w-1/2 lg:w-1/3 max-h-[90vh] overflow-y-auto">
                 <h2 class="text-xl font-bold mb-4">Detalhes do Estabelecimento</h2>
 
                 <ul class="space-y-2">

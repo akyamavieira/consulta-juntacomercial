@@ -3,48 +3,48 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Services\EstabelecimentoService;
-use App\DTO\DetalhesEstabelecimentoDTO;
-use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class EstabelecimentosTable extends Component
 {
-    public $estabelecimentos;
     public $detalhesEstabelecimento;
     public $mostrarModal = false;
     public $tooltipIdentificador = null;
     public $tooltipMessage = null;
-    protected $estabelecimentoService;
+    public $perPage = 10;
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    public function boot(\App\Services\EstabelecimentoService $estabelecimentoService)
     {
         $this->estabelecimentoService = $estabelecimentoService;
     }
 
     public function mount()
     {
-        $this->atualizarEstabelecimentos();
+
     }
 
-    public function atualizarEstabelecimentos()
+    public function getEstabelecimentosProperty()
     {
-        // Busca estabelecimentos do serviço com cache já configurado
-        $this->estabelecimentos = $this->estabelecimentoService->getEstabelecimentos();
+        $allItems = $this->estabelecimentoService->getEstabelecimentos();
+        // Ensure the structure here:
+        $records = $allItems['registrosRedesim']['registroRedesim'] ?? []; 
+        return $this->paginate($records, $this->perPage);
     }
 
-    public function paginate($items, $perPage = 10, $page = null, $options = [])
+    public function paginate(array $items, $perPage, $page = null, $options = [])
     {
-        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-        $items = is_array($items) ? collect($items) : $items;
+        $page = $page ?: LengthAwarePaginator::resolveCurrentPage();  // Usa a página atual da query string
+        $items = collect($items);
         $total = $items->count();
         $results = $items->forPage($page, $perPage)->values();
+
         return new LengthAwarePaginator(
             $results,
             $total,
             $perPage,
             $page,
-            array_merge(['path' => request()->url()], $options)
+            array_merge(['path' => request()->url(), 'query' => request()->query()], $options)
         );
     }
 
@@ -305,7 +305,8 @@ class EstabelecimentosTable extends Component
 
     public function render()
     {
-    
-        return view('livewire.estabelecimentos-table');
+        return view('livewire.estabelecimentos-table', [
+            'estabelecimentos' => $this->estabelecimentos,
+        ]);
     }
 }

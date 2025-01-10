@@ -1,4 +1,4 @@
-<div wire:poll.300000ms="atualizarEstabelecimentos" class="flex items-center justify-center">
+<div class="flex flex-col items-center justify-center">
     <table class="border border-gray-200 rounded-3xl overflow-hidden">
         <thead>
             <tr class="bg-gray-100 text-left">
@@ -9,7 +9,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($estabelecimentos['registrosRedesim']['registroRedesim'] as $estabelecimento)
+            @foreach($estabelecimentos as $estabelecimento)
                 <tr class="border-t">
                     <td class="px-3 py-3 text-sm text-gray-800 max-w-36 md:max-w-full">
                         {{$estabelecimento['dadosRedesim']['nomeEmpresarial'] }}
@@ -39,6 +39,10 @@
             @endforeach
         </tbody>
     </table>
+    <!-- Pagination Links -->
+    <div class="mt-4">
+        {{ $estabelecimentos->links() }}
+    </div>
 
     <!-- Modal -->
     @if($mostrarModal)

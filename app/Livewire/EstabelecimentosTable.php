@@ -44,7 +44,7 @@ class EstabelecimentosTable extends Component
             $total,
             $perPage,
             $page,
-            array_merge(['path' => request()->url(), 'query' => request()->query()], $options)
+            array_merge(['path' => url()->current(), 'query' => request()->query()], $options)
         );
     }
 

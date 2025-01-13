@@ -26,6 +26,7 @@ class EstabelecimentoService
                 $this->handleApiRateLimit($data);
             }
         );
+        
     }
 
     public function getEstabelecimentoPorIdentificador(string $identificador)
@@ -79,6 +80,7 @@ class EstabelecimentoService
     {
         try {
             $data = Cache::get($cacheKey);
+            //dd($data["registrosRedesim"]["registroRedesim"]["0"]["eventos"]["evento"]["0"]["codEvento"]);
             // $identificadores = collect(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"])->pluck('identificador')->all();
             //dd($data);
 
@@ -100,7 +102,6 @@ class EstabelecimentoService
                 if (is_array($data) && ($data['status'] ?? null) === 'OK') {
                     Cache::put($cacheKey, $data, now()->addMinutes(self::CACHE_TTL));
                     Log::info("Dados armazenados no cache para a chave: $cacheKey.");
-                    //dd(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"]["identificador"]);
                     // Extrai os identificadores
                     $identificadores = collect(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"])->pluck('identificador')->all();
                     if (!empty($identificadores)) {

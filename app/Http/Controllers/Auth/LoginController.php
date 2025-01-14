@@ -36,12 +36,6 @@ class LoginController extends Controller
         $driver->setHttpClient($guzzleClient);
         $user = $driver->stateless()->user();
 
-        if ($user) {
-            dd($user);
-        } else {
-            dd('Usuário não autenticado');
-        }
-
         // Redireciona para a rota principal após o login
         return redirect()->intended('/');
     }

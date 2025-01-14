@@ -35,21 +35,11 @@ class LoginController extends Controller
         $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false,),));
         $driver->setHttpClient($guzzleClient);
         $user = $driver->stateless()->user();
-        // Verifica se o usuário já existe no banco de dados
-        $existingUser = User::where('email', $user->email)->first();
 
-        if ($existingUser) {
-            // Autentica o usuário existente
-            Auth::login($existingUser);
+        if ($user) {
+            dd($user);
         } else {
-            // Cria um novo usuário, se necessário
-            $newUser = User::create([
-                'name' => $user->name,
-                'email' => $user->email,
-                'keycloak_id' => $user->id, // Certifique-se de ter esta coluna na tabela de usuários
-            ]);
-
-            Auth::login($newUser);
+            dd('Usuário não autenticado');
         }
 
         // Redireciona para a rota principal após o login

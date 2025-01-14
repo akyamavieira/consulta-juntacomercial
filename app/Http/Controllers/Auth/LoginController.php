@@ -35,6 +35,7 @@ class LoginController extends Controller
         $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false,),));
         $driver->setHttpClient($guzzleClient);
         $user = $driver->stateless()->user();
+        dd(Cache::get('estabelecimentos'));
 
         // Redireciona para a rota principal após o login
         return redirect()->route('index');

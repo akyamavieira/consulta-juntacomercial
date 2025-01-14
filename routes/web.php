@@ -16,5 +16,5 @@ Route::get('/wait', function () {
 })->name("wait")->middleware([VerifyKeycloakAuth::class]);
 
 // Rotas de autenticação com Keycloak
-Route::get('login/keycloak', [LoginController::class, 'redirectToKeycloak'])->name('login.keycloak');
-Route::get('login/keycloak/callback', [LoginController::class, 'handleKeycloakCallback']);
+Route::get('/login', [LoginController::class, 'redirectToKeycloak'])->name('login.keycloak');
+Route::get('/callback', [LoginController::class, 'handleKeycloakCallback']);

@@ -37,6 +37,6 @@ class LoginController extends Controller
         $user = $driver->stateless()->user();
 
         // Redireciona para a rota principal após o login
-        return redirect()->intended('/');
+        return redirect()->route('index');
     }
 }

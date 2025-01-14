@@ -29,8 +29,12 @@ class LoginController extends Controller
     public function handleKeycloakCallback()
     {
         // Obtém o usuário autenticado no Keycloak
-        $user = Socialite::driver('keycloak')->user();
-
+        /** @var \Laravel\Socialite\Two\AbstractProvider  */
+        $driver = Socialite::driver('keycloak');
+        // Ignora a verificação SSL
+        $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false,),));
+        $driver->setHttpClient($guzzleClient);
+        $user = $driver->stateless()->user();
         // Verifica se o usuário já existe no banco de dados
         $existingUser = User::where('email', $user->email)->first();
 

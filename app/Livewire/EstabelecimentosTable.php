@@ -13,6 +13,7 @@ class EstabelecimentosTable extends Component
     public $tooltipIdentificador = null;
     public $tooltipMessage = null;
     public $perPage = 10;
+    public $page = 1; // Adicionar a variável de controle da página
 
     public function boot(\App\Services\EstabelecimentoService $estabelecimentoService)
     {
@@ -29,7 +30,8 @@ class EstabelecimentosTable extends Component
         $allItems = $this->estabelecimentoService->getEstabelecimentos();
         // Ensure the structure here:
         $records = $allItems['registrosRedesim']['registroRedesim'] ?? []; 
-        return $this->paginate($records, $this->perPage);
+            // Se o total de itens mudar, deve forçar a atualização da página
+        return $this->paginate($records, $this->perPage, $this->page)->withQueryString();
     }
 
     public function paginate(array $items, $perPage, $page = null, $options = [])

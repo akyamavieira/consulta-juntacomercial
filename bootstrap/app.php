@@ -25,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'livewire/*'
         ]);
-        $middleware->append(VerifyKeycloakAuth::class);
+        // $middleware->append(VerifyKeycloakAuth::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

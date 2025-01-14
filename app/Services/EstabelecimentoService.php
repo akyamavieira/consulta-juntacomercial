@@ -10,7 +10,7 @@ use Log;
 
 class EstabelecimentoService
 {
-    private const CACHE_TTL = 50000; // Tempo em minutos para manter os dados no cache
+    private const CACHE_TTL = 5; // Tempo em minutos para manter os dados no cache
     private const BASE_URL = 'https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest';
 
     public function getEstabelecimentos()
@@ -142,7 +142,7 @@ class EstabelecimentoService
                 $nextRequestTime = Carbon::createFromFormat('H:i:s', $matches[1]);
                 $now = Carbon::now();
                 $waitTime = intval($now->diffInSeconds($nextRequestTime, false));
-                if ($nextRequestTime > $now) {
+                if (Cache::get('estabelecimentos') == null) {
                     Log::warning("Aguarde $waitTime segundos até as {$nextRequestTime->format('H:i:s')} para tentar novamente.");
                     // Redirecionar para uma página de erro com o tempo restante
                     return redirect()->route('wait', [

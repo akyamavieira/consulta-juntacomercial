@@ -10,7 +10,7 @@ use Log;
 
 class EstabelecimentoService
 {
-    private const CACHE_TTL = 5; // Tempo em minutos para manter os dados no cache
+    private const CACHE_TTL = 50000; // Tempo em minutos para manter os dados no cache
     private const BASE_URL = 'https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest';
 
     public function getEstabelecimentos()

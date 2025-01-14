@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
@@ -19,32 +20,21 @@ class VerifyKeycloakAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        try {
-            if (!Session::has('user')) {
-                return redirect()->to('/login');
-            }
+        
+            // // /** @var \Laravel\Socialite\Two\AbstractProvider */
+            // $driver = Socialite::driver('keycloak');
 
-            // Tenta recuperar o usuário do Keycloak a partir da sessão
-            /** @var \Laravel\Socialite\Two\AbstractProvider  */
-            $driver = Socialite::driver('keycloak');
-            $user = Session::get('user');
+            // // Verifica se o usuário está autenticado na sessão
+            // if (!Session::has('user') || !Session::get('user')['id']) {
+            //     // Previne loops de redirecionamento
+            //     if ($request->route()->getName() === 'keycloak.callback') {
+            //         Log::error('Redirecionamento em loop detectado.');
+            //         abort(500, 'Erro de redirecionamento em loop.');
+            //     }
 
-            if (!$user || !$user->getId()) {
-                return redirect()->to('/login');
-            }
-
-            $request->merge(['keycloak_user' => $user]);
-
-            // Continua o fluxo da aplicação
+            //     return $driver->stateless()->redirect();
+            // }
             return $next($request);
-        } catch (InvalidStateException $e) {
-            // Caso ocorra um erro no OAuth (como um estado inválido)
-            Log::error('Erro ao verificar a sessão do Keycloak: InvalidStateException', ['exception' => $e]);
-            return redirect()->to('/login');
-        } catch (\Exception $e) {
-            // Captura qualquer outro erro inesperado
-            Log::error('Erro inesperado ao verificar a sessão do Keycloak', ['exception' => $e]);
-            return redirect()->to('/login');
-        }
     }
 }
+

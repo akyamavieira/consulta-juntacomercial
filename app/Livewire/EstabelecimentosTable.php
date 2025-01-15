@@ -24,13 +24,14 @@ class EstabelecimentosTable extends Component
     // Consulta os estabelecimentos diretamente sem paginação
     public function getEstabelecimentosProperty()
     {
-        $allItems = $this->estabelecimentoService->getEstabelecimentos();
-    
-        // Verifica se 'registroRedesim' é um array antes de acessar
-        $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
-        
-        // Certifique-se de retornar uma coleção ou um array
-        return collect($records);
+        try {
+            $data = $this->estabelecimentoService->getEstabelecimentos();
+            return collect($data['registrosRedesim']['registroRedesim'] ?? []);
+        } catch (\Exception $e) {
+            // Opcional: logar o erro
+            \Log::error('Erro ao carregar estabelecimentos: ' . $e->getMessage());
+            return collect();
+        }
     }
 
 

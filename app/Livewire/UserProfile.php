@@ -11,7 +11,7 @@ class UserProfile extends Component
 
     public function mount()
     {
-        $this->user = session('loggedUser'); // Obtém os dados unificados da sessão
+        $this->user = session('user'); // Obtém os dados unificados da sessão
          // Extrai o primeiro nome do nome completo
         if (isset($this->user['name'])) {
             $this->user['name'] = explode(' ', $this->user['name'])[0]; // Pega o primeiro nome

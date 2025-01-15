@@ -7,15 +7,18 @@ use Livewire\Component;
 
 class UserProfile extends Component
 {
-    public $user;
+    public $firstName;
 
     public function mount()
     {
-        $this->user = session('user'); // Obtém os dados unificados da sessão
-         // Extrai o primeiro nome do nome completo
-        if (isset($this->user['name'])) {
-            $this->user['name'] = explode(' ', $this->user['name'])[0]; // Pega o primeiro nome
-    }
+        $user = session('user'); // Obtém os dados unificados da sessão
+        // Extrai o primeiro nome do nome completo
+        // Verifica se o nome existe e extrai o primeiro nome
+        if (isset($user['name'])) {
+            $this->firstName = explode(' ', $user['name'])[0]; // Pega o primeiro nome
+        } else {
+            $this->firstName = null;
+        }
     }
 
     public function render()

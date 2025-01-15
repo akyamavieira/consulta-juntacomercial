@@ -1,6 +1,6 @@
 <div>
-    @if ($user && isset($user['name']))
-        <div>{{ $user['name'] }}</div>
+    @if ($firstName)
+        <div>{{$firstName}}</div>
     @else
         <p>Usuário não encontrado.</p>
     @endif

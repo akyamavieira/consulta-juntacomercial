@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -36,6 +37,8 @@ class LoginController extends Controller
         $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false,),));
         $driver->setHttpClient($guzzleClient);
         $user = $driver->stateless()->user();
+        Session::put('user',$user);
+        dd(Session::get('user'));
 
         // Redireciona para a rota principal após o login
         return redirect()->route('index');

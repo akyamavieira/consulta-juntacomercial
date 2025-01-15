@@ -33,7 +33,7 @@ class VerifyKeycloakAuth
         if ($this->shouldPassThrough($request)) {
             return $next($request);
         }
-        dd(Session::get('user'));
+        // dd(Session::get('user'));
         // Lógica de autenticação
         if (!Session::has('user') || !Session::get('user')['id']) {
             // Previne loops de redirecionamento

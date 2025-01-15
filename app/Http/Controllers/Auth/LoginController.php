@@ -38,6 +38,7 @@ class LoginController extends Controller
         $driver->setHttpClient($guzzleClient);
         $user = $driver->stateless()->user();
         Session::put('user',$user);
+        dd(Session::get('user'));
 
         // Redireciona para a rota principal após o login
         return redirect()->route('index');

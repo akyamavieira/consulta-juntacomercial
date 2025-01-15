@@ -1,6 +1,6 @@
 <div>
     @if ($firstName)
-        <div>{{$firstName}}</div>
+        <div>{{ $firstName }}</div>
     @else
         <p>Usuário não encontrado.</p>
     @endif

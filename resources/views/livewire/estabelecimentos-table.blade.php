@@ -9,7 +9,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($this->estabelecimentos as $estabelecimento)
+            @foreach($estabelecimentos as $estabelecimento)
                 <tr class="border-t">
                     <td class="px-3 py-3 text-sm text-gray-800 max-w-36 md:max-w-full">
                         {{$estabelecimento['dadosRedesim']['nomeEmpresarial'] }}

@@ -25,9 +25,12 @@ class EstabelecimentosTable extends Component
     public function getEstabelecimentosProperty()
     {
         $allItems = $this->estabelecimentoService->getEstabelecimentos();
+    
+        // Verifica se 'registroRedesim' é um array antes de acessar
+        $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
         
-        // Retorna os registros encontrados
-        return $allItems['registrosRedesim']['registroRedesim'] ?? [];
+        // Certifique-se de retornar uma coleção ou um array
+        return collect($records);
     }
 
 
@@ -288,6 +291,8 @@ class EstabelecimentosTable extends Component
 
     public function render()
     {
-        return view('livewire.estabelecimentos-table');
+        return view('livewire.estabelecimentos-table', [
+            'estabelecimentos' => $this->getEstabelecimentosProperty(),
+        ]);
     }
 }

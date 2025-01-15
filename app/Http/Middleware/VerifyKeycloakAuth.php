@@ -4,37 +4,62 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
-use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\Two\InvalidStateException;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyKeycloakAuth
 {
     /**
+     * Rotas que devem ser ignoradas pelo middleware.
+     *
+     * @var array
+     */
+    protected $except = [
+        'login',
+        'callback',
+    ];
+
+    /**
      * Handle an incoming request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next): Response
     {
-        
-            // // /** @var \Laravel\Socialite\Two\AbstractProvider */
-            // $driver = Socialite::driver('keycloak');
-
-            // // Verifica se o usuário está autenticado na sessão
-            // if (!Session::has('user') || !Session::get('user')['id']) {
-            //     // Previne loops de redirecionamento
-            //     if ($request->route()->getName() === 'keycloak.callback') {
-            //         Log::error('Redirecionamento em loop detectado.');
-            //         abort(500, 'Erro de redirecionamento em loop.');
-            //     }
-
-            //     return $driver->stateless()->redirect();
-            // }
+        // Verifica se a rota atual está na lista de exceções
+        if ($this->shouldPassThrough($request)) {
             return $next($request);
+        }
+
+        // Lógica de autenticação
+        if (!Session::has('user') || !Session::get('user')['id']) {
+            // Previne loops de redirecionamento
+            if ($request->route() && $request->route()->getName() === 'callback') {
+                Log::error('Redirecionamento em loop detectado.');
+                abort(500, 'Erro de redirecionamento em loop.');
+            }
+
+            // Redireciona para a rota de login
+            return redirect()->route('login');
+        }
+
+        return $next($request);
+    }
+
+    /**
+     * Verifica se a rota deve passar pelo middleware.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function shouldPassThrough(Request $request): bool
+    {
+        // Verifica se a rota está presente antes de tentar acessar o nome
+        $routeName = $request->route() ? $request->route()->getName() : null;
+
+        return in_array($routeName, $this->except);
     }
 }
-

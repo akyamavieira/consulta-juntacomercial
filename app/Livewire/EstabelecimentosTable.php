@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Services\EstabelecimentoService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -26,26 +27,39 @@ class EstabelecimentosTable extends Component
 
     private $estabelecimentoService;
 
-    public function boot(\App\Services\EstabelecimentoService $estabelecimentoService)
+    public function boot(EstabelecimentoService $estabelecimentoService)
     {
         $this->estabelecimentoService = $estabelecimentoService;
     }
 
+    // Aqui, a consulta à API ou ao banco de dados é feita diretamente, retornando os registros paginados
     public function getEstabelecimentosProperty()
     {
         $allItems = $this->estabelecimentoService->getEstabelecimentos();
         
+        // Verifica se há registros
         $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
+        
+        // Retorna a paginação dos registros
         return $this->paginate($records, $this->perPage)->withQueryString();
     }
 
+    // Função de paginação personalizada
     public function paginate(array $items, $perPage)
     {
-        $page = $this->page ?? LengthAwarePaginator::resolveCurrentPage(); // Atualiza corretamente a página
+        // Define a página atual com base na query string ou assume a página 1
+        $page = request()->has('page') ? (int) request()->get('page') : 1;
+        
+        // Converte os itens para uma coleção
         $items = collect($items);
+        
+        // Conta o total de registros
         $total = $items->count();
+        
+        // Pega os itens da página atual
         $results = $items->forPage($page, $perPage)->values();
 
+        // Retorna a instância do LengthAwarePaginator com os resultados
         return new LengthAwarePaginator(
             $results,
             $total,
@@ -312,8 +326,6 @@ class EstabelecimentosTable extends Component
 
     public function render()
     {
-        return view('livewire.estabelecimentos-table', [
-            'estabelecimentos' => $this->estabelecimentos,
-        ]);
+        return view('livewire.estabelecimentos-table');
     }
 }

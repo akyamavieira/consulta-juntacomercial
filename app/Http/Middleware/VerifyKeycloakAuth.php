@@ -39,9 +39,6 @@ class VerifyKeycloakAuth
             // Redireciona para a rota de login
             return redirect()->route('login');
         }
-        if (Session::has('user')) {
-            dd(Session::get('user'));
-        }
         return $next($request);
     }
 

@@ -3,40 +3,45 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 class EstabelecimentosTable extends Component
 {
+    use WithPagination; // Adiciona suporte à paginação no Livewire
+
     public $detalhesEstabelecimento;
     public $mostrarModal = false;
     public $tooltipIdentificador = null;
     public $tooltipMessage = null;
-    public $perPage = 10;
-    public $page = 1; // Adicionar a variável de controle da página
+    public $perPage = 10; // Define o número de itens por página
+
+    protected $paginationTheme = 'tailwind'; // Tema para paginação (opcional, ex. 'tailwind')
+
+    protected $queryString = [
+        'page' => ['except' => 1], // Mantém a página atual na query string
+    ];
+
+    protected $listeners = ['refreshTable' => '$refresh'];
+
+    private $estabelecimentoService;
 
     public function boot(\App\Services\EstabelecimentoService $estabelecimentoService)
     {
         $this->estabelecimentoService = $estabelecimentoService;
     }
 
-    public function mount()
-    {
-
-    }
-
     public function getEstabelecimentosProperty()
     {
         $allItems = $this->estabelecimentoService->getEstabelecimentos();
-        // Ensure the structure here:
-        $records = $allItems['registrosRedesim']['registroRedesim'] ?? []; 
-            // Se o total de itens mudar, deve forçar a atualização da página
-        return $this->paginate($records, $this->perPage, $this->page)->withQueryString();
+        
+        $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
+        return $this->paginate($records, $this->perPage)->withQueryString();
     }
 
-    public function paginate(array $items, $perPage, $page = null, $options = [])
+    public function paginate(array $items, $perPage)
     {
-        $page = $page ?: LengthAwarePaginator::resolveCurrentPage();  // Usa a página atual da query string
+        $page = $this->page ?? LengthAwarePaginator::resolveCurrentPage(); // Atualiza corretamente a página
         $items = collect($items);
         $total = $items->count();
         $results = $items->forPage($page, $perPage)->values();
@@ -46,7 +51,7 @@ class EstabelecimentosTable extends Component
             $total,
             $perPage,
             $page,
-            array_merge(['path' => url()->current(), 'query' => request()->query()], $options)
+            ['path' => url()->current(), 'query' => request()->query()]
         );
     }
 

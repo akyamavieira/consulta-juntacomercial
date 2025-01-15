@@ -16,20 +16,32 @@ class EstabelecimentosTable extends Component
 
     private $estabelecimentoService;
 
+    // Método boot para injetar a dependência EstabelecimentoService
     public function boot(EstabelecimentoService $estabelecimentoService)
     {
+        \Log::info('Boot do componente EstabelecimentosTable iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
     }
 
-    // Consulta os estabelecimentos diretamente sem paginação
+    // Propriedade computada para consultar os estabelecimentos
     public function getEstabelecimentosProperty()
     {
         try {
+            \Log::info('Iniciando consulta de estabelecimentos.');
+
+            // Realiza a consulta através do serviço
             $data = $this->estabelecimentoService->getEstabelecimentos();
+
+            \Log::info('Consulta de estabelecimentos concluída com sucesso.', [
+                'total_estabelecimentos' => count($data['registrosRedesim']['registroRedesim'] ?? [])
+            ]);
+
             return collect($data['registrosRedesim']['registroRedesim'] ?? []);
         } catch (\Exception $e) {
-            // Opcional: logar o erro
-            \Log::error('Erro ao carregar estabelecimentos: ' . $e->getMessage());
+            // Log de erro com detalhes da exceção
+            \Log::error('Erro ao carregar estabelecimentos: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString()
+            ]);
             return collect();
         }
     }
@@ -290,10 +302,18 @@ class EstabelecimentosTable extends Component
         $this->mostrarModal = false; // Fecha o modal
     }
 
-    public function render()
-    {
-        return view('livewire.estabelecimentos-table', [
-            'estabelecimentos' => $this->getEstabelecimentosProperty(),
-        ]);
-    }
+ // Método de renderização do componente
+ public function render()
+ {
+     \Log::info('Renderização do componente EstabelecimentosTable iniciada.');
+     $estabelecimentos = $this->getEstabelecimentosProperty();
+
+     \Log::info('Renderização do componente concluída.', [
+         'total_estabelecimentos' => $estabelecimentos->count()
+     ]);
+
+     return view('livewire.estabelecimentos-table', [
+         'estabelecimentos' => $estabelecimentos,
+     ]);
+ }
 }

@@ -35,17 +35,13 @@ class VerifyKeycloakAuth
         }
         // dd(Session::get('user'));
         // Lógica de autenticação
-        if (!Session::has('user') || !Session::get('user')['id']) {
-            // Previne loops de redirecionamento
-            if ($request->route() && $request->route()->getName() === 'callback') {
-                Log::error('Redirecionamento em loop detectado.');
-                abort(500, 'Erro de redirecionamento em loop.');
-            }
-
+        if (!Session::has('user')) {
             // Redireciona para a rota de login
             return redirect()->route('login');
         }
-
+        if (Session::has('user')) {
+            dd(Session::get('user'));
+        }
         return $next($request);
     }
 

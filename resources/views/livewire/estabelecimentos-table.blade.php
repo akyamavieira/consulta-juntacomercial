@@ -39,11 +39,6 @@
             @endforeach
         </tbody>
     </table>
-    <!-- Pagination Links -->
-    <div class="mt-4">
-        {{ $this->estabelecimentos->links() }}
-    </div>
-
     <!-- Modal -->
     @if($mostrarModal)
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">

@@ -4,24 +4,13 @@ namespace App\Livewire;
 
 use App\Services\EstabelecimentoService;
 use Livewire\Component;
-use Livewire\WithPagination;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class EstabelecimentosTable extends Component
 {
-    use WithPagination; // Adiciona suporte à paginação no Livewire
-
     public $detalhesEstabelecimento;
     public $mostrarModal = false;
     public $tooltipIdentificador = null;
     public $tooltipMessage = null;
-    public $perPage = 10; // Define o número de itens por página
-
-    protected $paginationTheme = 'tailwind'; // Tema para paginação (opcional, ex. 'tailwind')
-
-    protected $queryString = [
-        'page' => ['except' => 1], // Mantém a página atual na query string
-    ];
 
     protected $listeners = ['refreshTable' => '$refresh'];
 
@@ -32,42 +21,15 @@ class EstabelecimentosTable extends Component
         $this->estabelecimentoService = $estabelecimentoService;
     }
 
-    // Aqui, a consulta à API ou ao banco de dados é feita diretamente, retornando os registros paginados
+    // Consulta os estabelecimentos diretamente sem paginação
     public function getEstabelecimentosProperty()
     {
         $allItems = $this->estabelecimentoService->getEstabelecimentos();
         
-        // Verifica se há registros
-        $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
-        
-        // Retorna a paginação dos registros
-        return $this->paginate($records, $this->perPage)->withQueryString();
+        // Retorna os registros encontrados
+        return $allItems['registrosRedesim']['registroRedesim'] ?? [];
     }
 
-    // Função de paginação personalizada
-    public function paginate(array $items, $perPage)
-    {
-        // Define a página atual com base na query string ou assume a página 1
-        $page = request()->has('page') ? (int) request()->get('page') : 1;
-        
-        // Converte os itens para uma coleção
-        $items = collect($items);
-        
-        // Conta o total de registros
-        $total = $items->count();
-        
-        // Pega os itens da página atual
-        $results = $items->forPage($page, $perPage)->values();
-
-        // Retorna a instância do LengthAwarePaginator com os resultados
-        return new LengthAwarePaginator(
-            $results,
-            $total,
-            $perPage,
-            $page,
-            ['path' => url()->current(), 'query' => request()->query()]
-        );
-    }
 
     public function mostrarTooltip($identificador, $codEvento)
     {

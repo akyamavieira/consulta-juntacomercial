@@ -20,6 +20,7 @@ composer require predis/predis:^2.0
 #sudo systemctl enable redis-server
 #sudo systemctl start redis-server
 # Atualizar dependências do Composer
-apt-get install php8.3-pgsql
-
+apt install -q -y libpq-dev && \
+docker-php-ext-install pdo_pgsql pgsql
+service php-fpm restart
 composer install && composer update

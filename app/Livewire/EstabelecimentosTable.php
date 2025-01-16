@@ -13,11 +13,8 @@ class EstabelecimentosTable extends Component
     public $mostrarModal = false;
     public $tooltipIdentificador = null;
     public $tooltipMessage = null;
-    public $perPage = 10; // Define o número de itens por página
+
     protected $paginationTheme = 'tailwind'; // Tema para paginação (opcional, ex. 'tailwind')
-    protected $queryString = [
-        'page' => ['except' => 1], // Mantém a página atual na query string
-    ];
 
     protected $listeners = ['refreshTable' => '$refresh'];
 
@@ -39,7 +36,7 @@ class EstabelecimentosTable extends Component
         $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
         
         // Retorna a paginação dos registros usando o método nativo do Livewire
-        return collect($records)->paginate($this->perPage)->withQueryString();
+        return collect($records)->paginate(10);
     }
     // public function paginate(array $items, $perPage)
     // {

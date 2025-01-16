@@ -4,13 +4,21 @@ namespace App\Livewire;
 
 use App\Services\EstabelecimentoService;
 use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EstabelecimentosTable extends Component
 {
+    use WithPagination; // Adiciona suporte à paginação no Livewireuse WithPagination; // Adiciona suporte à paginação no Livewire
     public $detalhesEstabelecimento;
     public $mostrarModal = false;
     public $tooltipIdentificador = null;
     public $tooltipMessage = null;
+    public $perPage = 10; // Define o número de itens por página
+    protected $paginationTheme = 'tailwind'; // Tema para paginação (opcional, ex. 'tailwind')
+    protected $queryString = [
+        'page' => ['except' => 1], // Mantém a página atual na query string
+    ];
 
     protected $listeners = ['refreshTable' => '$refresh'];
 
@@ -26,27 +34,36 @@ class EstabelecimentosTable extends Component
     // Propriedade computada para consultar os estabelecimentos
     public function getEstabelecimentosProperty()
     {
-        try {
-            \Log::info('Iniciando consulta de estabelecimentos.');
+        $allItems = $this->estabelecimentoService->getEstabelecimentos();
 
-            // Realiza a consulta através do serviço
-            $data = $this->estabelecimentoService->getEstabelecimentos();
-
-            \Log::info('Consulta de estabelecimentos concluída com sucesso.', [
-                'total_estabelecimentos' => count($data['registrosRedesim']['registroRedesim'] ?? [])
-            ]);
-
-            return collect($data['registrosRedesim']['registroRedesim'] ?? []);
-        } catch (\Exception $e) {
-            // Log de erro com detalhes da exceção
-            \Log::error('Erro ao carregar estabelecimentos: ' . $e->getMessage(), [
-                'stack' => $e->getTraceAsString()
-            ]);
-            return collect();
-        }
+        // Verifica se há registros
+        $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
+        
+        // Retorna a paginação dos registros
+        return $this->paginate($records, $this->perPage)->withQueryString();
     }
-
-
+    public function paginate(array $items, $perPage)
+    {
+        // Define a página atual com base na query string ou assume a página 1
+        $page = request()->has('page') ? (int) request()->get('page') : 1;
+        
+        // Converte os itens para uma coleção
+        $items = collect($items);
+        
+        // Conta o total de registros
+        $total = $items->count();
+        
+        // Pega os itens da página atual
+        $results = $items->forPage($page, $perPage)->values();
+        // Retorna a instância do LengthAwarePaginator com os resultados
+        return new LengthAwarePaginator(
+            $results,
+            $total,
+            $perPage,
+            $page,
+            ['path' => url()->current(), 'query' => request()->query()]
+        );
+    }
     public function mostrarTooltip($identificador, $codEvento)
     {
         //dd($codEvento);
@@ -305,12 +322,7 @@ class EstabelecimentosTable extends Component
  // Método de renderização do componente
  public function render()
  {
-     \Log::info('Renderização do componente EstabelecimentosTable iniciada.');
      $estabelecimentos = $this->getEstabelecimentosProperty();
-
-     \Log::info('Renderização do componente concluída.', [
-         'total_estabelecimentos' => $estabelecimentos->count()
-     ]);
 
      return view('livewire.estabelecimentos-table', [
          'estabelecimentos' => $estabelecimentos,

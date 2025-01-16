@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Services\EstabelecimentoService;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class EstabelecimentosTable extends Component
 {
@@ -39,31 +38,31 @@ class EstabelecimentosTable extends Component
         // Verifica se há registros
         $records = $allItems['registrosRedesim']['registroRedesim'] ?? [];
         
-        // Retorna a paginação dos registros
-        return $this->paginate($records, $this->perPage)->withQueryString();
+        // Retorna a paginação dos registros usando o método nativo do Livewire
+        return collect($records)->paginate($this->perPage)->withQueryString();
     }
-    public function paginate(array $items, $perPage)
-    {
-        // Define a página atual com base na query string ou assume a página 1
-        $page = request()->has('page') ? (int) request()->get('page') : 1;
+    // public function paginate(array $items, $perPage)
+    // {
+    //     // Define a página atual com base na query string ou assume a página 1
+    //     $page = request()->has('page') ? (int) request()->get('page') : 1;
         
-        // Converte os itens para uma coleção
-        $items = collect($items);
+    //     // Converte os itens para uma coleção
+    //     $items = collect($items);
         
-        // Conta o total de registros
-        $total = $items->count();
+    //     // Conta o total de registros
+    //     $total = $items->count();
         
-        // Pega os itens da página atual
-        $results = $items->forPage($page, $perPage)->values();
-        // Retorna a instância do LengthAwarePaginator com os resultados
-        return new LengthAwarePaginator(
-            $results,
-            $total,
-            $perPage,
-            $page,
-            ['path' => url()->current(), 'query' => request()->query()]
-        );
-    }
+    //     // Pega os itens da página atual
+    //     $results = $items->forPage($page, $perPage)->values();
+    //     // Retorna a instância do LengthAwarePaginator com os resultados
+    //     return new LengthAwarePaginator(
+    //         $results,
+    //         $total,
+    //         $perPage,
+    //         $page,
+    //         ['path' => url()->current(), 'query' => request()->query()]
+    //     );
+    // }
     public function mostrarTooltip($identificador, $codEvento)
     {
         //dd($codEvento);

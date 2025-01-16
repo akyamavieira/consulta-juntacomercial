@@ -50,7 +50,7 @@ class EstabelecimentosTable extends Component
             $total,
             $perPage,
             $page,
-            ['path' => url()->current(), 'query' => request()->query()]
+            ['path' => url()->current(), 'query' => array_merge(request()->query(), ['page' => $page])]
         );
     }
 

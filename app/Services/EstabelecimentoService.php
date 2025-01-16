@@ -26,7 +26,7 @@ class EstabelecimentoService
                 $this->handleApiRateLimit($data);
             }
         );
-        
+
     }
 
     public function getEstabelecimentoPorIdentificador(string $identificador)
@@ -75,7 +75,7 @@ class EstabelecimentoService
             return null;
         }
     }
-    
+
     private function getCachedData(string $cacheKey, string $url, array $payload, callable $callback = null)
     {
         try {
@@ -138,20 +138,35 @@ class EstabelecimentoService
         $mensagem = $data['mensagem'] ?? null;
 
         if ($mensagem && strpos($mensagem, 'Somente após') !== false) {
+            // A lógica de extração do horário pode falhar se o formato for diferente
             if (preg_match('/Somente após as (\d{2}:\d{2}:\d{2})/', $mensagem, $matches)) {
-                $nextRequestTime = Carbon::createFromFormat('H:i:s', $matches[1]);
-                $now = Carbon::now();
-                $waitTime = intval($now->diffInSeconds($nextRequestTime, false));
-                if ($nextRequestTime > $now) {
-                    Log::warning("Aguarde $waitTime segundos até as {$nextRequestTime->format('H:i:s')} para tentar novamente.");
-                    // Redirecionar para uma página de erro com o tempo restante
-                    return redirect()->route('wait', [
-                        'waitTime' => $waitTime,
-                        'nextRequestTime' => $nextRequestTime->format('H:i:s')
-                    ]);
+                try {
+                    // Criar Carbon a partir do horário da mensagem
+                    $nextRequestTime = Carbon::createFromFormat('H:i:s', $matches[1], 'UTC')->setDate(
+                        now()->year,
+                        now()->month,
+                        now()->day
+                    );
+                    $now = now();
+
+                    // Verificar se o horário de bloqueio já passou
+                    if ($nextRequestTime->lt($now)) {
+                        Log::info('O horário informado já passou, tentando novamente.');
+                        return;
+                    }
+
+                    // Calcular tempo restante
+                    $waitTime = $now->diffInSeconds($nextRequestTime, false);
+                    if ($waitTime > 0) {
+                        Log::warning("Aguarde $waitTime segundos até as {$nextRequestTime->format('H:i:s')} para tentar novamente.");
+                        // Implementar tratamento adequado para a espera
+                        throw new Exception("Limite de requisição atingido, aguarde $waitTime segundos.");
+                    }
+                } catch (Exception $e) {
+                    Log::error("Erro ao processar a mensagem de rate limit: " . $e->getMessage());
                 }
             } else {
-                Log::error("Não foi possível interpretar o horário na mensagem: $mensagem.");
+                Log::error("Não foi possível interpretar a mensagem de rate limit.");
             }
         }
     }

@@ -40,7 +40,7 @@ class EstabelecimentosTable extends Component
 
     public function paginate(array $items, $perPage)
     {
-        $page = $this->page ?? 1; // Usando a paginação do Livewire
+        $page = request()->has('page') ? (int) request()->get('page') : 1;
         $items = collect($items);
         $total = $items->count();
         $results = $items->forPage($page, $perPage)->values();
@@ -50,7 +50,7 @@ class EstabelecimentosTable extends Component
             $total,
             $perPage,
             $page,
-            ['path' => url()->current(), 'query' => array_merge(request()->query(), ['page' => $page])]
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'query' => request()->query()]
         );
     }
 

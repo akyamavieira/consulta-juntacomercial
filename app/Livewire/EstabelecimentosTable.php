@@ -40,7 +40,7 @@ class EstabelecimentosTable extends Component
 
     public function paginate(array $items, $perPage)
     {
-        $page = request()->has('page') ? (int) request()->get('page') : 1;
+        $page = $this->page ?? 1; // Usando a paginação do Livewire
         $items = collect($items);
         $total = $items->count();
         $results = $items->forPage($page, $perPage)->values();

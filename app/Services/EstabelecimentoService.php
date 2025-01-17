@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use App\DTO\EstabelecimentoDTO;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Exception;
@@ -15,7 +16,7 @@ class EstabelecimentoService
 
     public function getEstabelecimentos()
     {
-        return $this->getCachedData(
+        $data = $this->getCachedData(
             'estabelecimentos',
             self::BASE_URL . '/wsE013/recuperaEstabelecimentos',
             [
@@ -26,7 +27,13 @@ class EstabelecimentoService
                 $this->handleApiRateLimit($data);
             }
         );
-
+    
+        $estabelecimentos = collect($data['registrosRedesim']['registroRedesim'] ?? [])
+            ->map(function ($item) {
+                return new EstabelecimentoDTO($item);
+            });
+    
+        return $estabelecimentos;
     }
 
     public function getEstabelecimentoPorIdentificador(string $identificador)
@@ -35,13 +42,15 @@ class EstabelecimentoService
         $estabelecimento = collect($estabelecimentos)->firstWhere('identificador', $identificador);
         if ($estabelecimento) {
             Log::info("Estabelecimento encontrado no cache geral para o Identificador: $identificador.");
-            return $estabelecimento["dadosRedesim"];
+            return new EstabelecimentoDTO($estabelecimento["dadosRedesim"]);
         }
-        return $this->getCachedData(
+        $data = $this->getCachedData(
             "estabelecimento_{$identificador}",
             self::BASE_URL . '/wsE013/recuperaEstabelecimentoPorIdentificador',
             ['identificador' => $identificador]
         );
+    
+        return new EstabelecimentoDTO($data);
     }
 
     public function informaRecebimento(array $identificadores)

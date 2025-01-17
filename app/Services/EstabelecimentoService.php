@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use App\DTO\EstabelecimentoDTO;
+use App\Models\Estabelecimento;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Exception;
@@ -28,11 +29,16 @@ class EstabelecimentoService
             }
         );
     
-        $estabelecimentos = collect($data['registrosRedesim']['registroRedesim'] ?? [])
+        $estabelecimentosDTO = collect($data['registrosRedesim']['registroRedesim'] ?? [])
             ->map(function ($item) {
                 return new EstabelecimentoDTO($item);
             });
-    
+
+        // Converta os DTOs para modelos Eloquent
+        $estabelecimentos = $estabelecimentosDTO->map(function ($dto) {
+            return new Estabelecimento((array) $dto);
+        });
+
         return $estabelecimentos;
     }
 
@@ -42,7 +48,8 @@ class EstabelecimentoService
         $estabelecimento = collect($estabelecimentos)->firstWhere('identificador', $identificador);
         if ($estabelecimento) {
             Log::info("Estabelecimento encontrado no cache geral para o Identificador: $identificador.");
-            return new EstabelecimentoDTO($estabelecimento["dadosRedesim"]);
+            $dto = new EstabelecimentoDTO($estabelecimento["dadosRedesim"]);
+            return new Estabelecimento((array) $dto);
         }
         $data = $this->getCachedData(
             "estabelecimento_{$identificador}",
@@ -50,7 +57,8 @@ class EstabelecimentoService
             ['identificador' => $identificador]
         );
     
-        return new EstabelecimentoDTO($data);
+        $dto = new EstabelecimentoDTO($data);
+        return new Estabelecimento((array) $dto);
     }
 
     public function informaRecebimento(array $identificadores)

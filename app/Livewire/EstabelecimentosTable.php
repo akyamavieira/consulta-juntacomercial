@@ -27,17 +27,6 @@ class EstabelecimentosTable extends Component
         $this->estabelecimentoService = $estabelecimentoService;
     }
 
-    public function getEstabelecimentosProperty()
-    {
-        $allItems = $this->estabelecimentoService->getEstabelecimentos();
-
-        // Converta a coleção para um modelo Eloquent
-        $eloquentCollection = Estabelecimento::hydrate($allItems->toArray());
-
-        // Retorna a paginação dos registros
-        return $eloquentCollection->paginate(10); // Use 10 itens por página
-    }
-
     public function mostrarTooltip($identificador, $codEvento)
     {
         //dd($codEvento);
@@ -295,7 +284,8 @@ class EstabelecimentosTable extends Component
     // Método de renderização do componente
     public function render()
     {
-        $estabelecimentos = $this->getEstabelecimentosProperty();
+        // Utilize a paginação diretamente no modelo Eloquent
+        $estabelecimentos = Estabelecimento::paginate(10); // Use 10 itens por página
 
         return view('livewire.estabelecimentos-table', [
             'estabelecimentos' => $estabelecimentos,

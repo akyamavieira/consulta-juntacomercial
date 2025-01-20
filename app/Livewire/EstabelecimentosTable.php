@@ -21,10 +21,13 @@ class EstabelecimentosTable extends Component
 
     private $estabelecimentoService;
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    public function mount(EstabelecimentoService $estabelecimentoService)
     {
-        \Log::info('Boot do componente EstabelecimentosTable iniciado.');
+        \Log::info('Mount do componente EstabelecimentosTable iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
+        \Log::info('Serviço de Estabelecimento injetado: ' . get_class($this->estabelecimentoService));
+        // Chama o método getEstabelecimentos para carregar e persistir os dados
+        $this->estabelecimentoService->getEstabelecimentos();
     }
 
     public function mostrarTooltip($identificador, $codEvento)
@@ -244,51 +247,20 @@ class EstabelecimentosTable extends Component
     }
     public function mostrarDetalhes($identificador)
     {
-        // Busca os detalhes do estabelecimento pelo CNPJ
-        $dados = $this->estabelecimentoService->getEstabelecimentoPorIdentificador($identificador);
-        $this->detalhesEstabelecimento = [
-            'cnpj' => $dados->cnpj,
-            'nomeEmpresarial' => $dados->nomeEmpresarial,
-            'nomeFantasia' => $dados->nomeFantasia,
-            'dataAberturaEstabelecimento'=> $dados->dataAberturaEstabelecimento,
-            'dataAberturaEmpresa'=> $dados->dataAberturaEmpresa,
-            'dataInicioAtividade' => $dados->dataInicioAtividade,
-            'nuProcessoOrgaoRegistro' => $dados->nuProcessoOrgaoRegistro,
-            'situacaoCadastralRFB_descricao' => $dados->situacaoCadastralRFB_descricao,
-            'opcaoSimplesNacional' => $dados->opcaoSimplesNacional,
-            'porte' => $dados->porte,
-            'nuInscricaoMunicipal' => $dados->nuInscricaoMunicipal,
-            'capitalSocial' => $dados->capitalSocial,
-            'possuiEstabelecimento' => $dados->possuiEstabelecimento,
-            'ultimaViabilidadeVinculada' => $dados->ultimaViabilidadeVinculada,
-            'ultimaViabilidadeAnaliseEndereco' => $dados->ultimaViabilidadeAnaliseEndereco,
-            'dataUltimaAnaliseEndereco' => $dados->dataUltimaAnaliseEndereco,
-            'ultimoColetorEstadualWebVinculado' => $dados->ultimoColetorEstadualWebVinculado,
-            'endereco_cep' => $dados->endereco_cep,
-            'endereco_logradouro' => $dados->endereco_logradouro,
-            'endereco_codTipoLogradouro' => $dados->endereco_codTipoLogradouro,
-            'endereco_numLogradouro' => $dados->endereco_numLogradouro,
-            'endereco_complemento' => $dados->endereco_complemento,
-            'endereco_bairro' => $dados->endereco_bairro,
-            'endereco_codMunicipio' => $dados->endereco_codMunicipio,
-            'endereco_uf' => $dados->endereco_uf,
-        ];
-
-        $this->mostrarModal = true;
+        \Log::info('Método mostrarDetalhes chamado.');
+        // Dispara um evento para o componente EstabelecimentoDetalhes
+        $this->dispatch('mostrarDetalhes', identificador: $identificador);
     }
-    public function fecharModal()
+
+    public function getEstabelecimentosProperty()
     {
-        $this->mostrarModal = false; // Fecha o modal
+        return Estabelecimento::paginate(10); // Use 10 itens por página
     }
 
-    // Método de renderização do componente
     public function render()
     {
-        // Utilize a paginação diretamente no modelo Eloquent
-        $estabelecimentos = Estabelecimento::paginate(10); // Use 10 itens por página
-
         return view('livewire.estabelecimentos-table', [
-            'estabelecimentos' => $estabelecimentos,
+            'estabelecimentos' => $this->estabelecimentos,
         ]);
     }
 }

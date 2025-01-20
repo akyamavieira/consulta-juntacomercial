@@ -28,37 +28,35 @@ class EstabelecimentoService
                 $this->handleApiRateLimit($data);
             }
         );
-    
+        //dd($data);
         $estabelecimentosDTO = collect($data['registrosRedesim']['registroRedesim'] ?? [])
             ->map(function ($item) {
                 return new EstabelecimentoDTO($item);
             });
-
-        // Converta os DTOs para modelos Eloquent
+        //dd($data);
+        // Converta os DTOs para modelos Eloquent e persista no banco de dados
         $estabelecimentos = $estabelecimentosDTO->map(function ($dto) {
-            return new Estabelecimento((array) $dto);
+            // Verifica se o CNPJ já existe
+            $existingEstabelecimento = Estabelecimento::where('cnpj', $dto->cnpj)->first();
+            if ($existingEstabelecimento) {
+                // Atualiza o registro existente
+                $existingEstabelecimento->update((array) $dto);
+                return $existingEstabelecimento;
+            } else {
+                // Insere um novo registro
+                $estabelecimento = new Estabelecimento((array) $dto);
+                $estabelecimento->save();
+                return $estabelecimento;
+            }
         });
-
+    
         return $estabelecimentos;
     }
 
     public function getEstabelecimentoPorIdentificador(string $identificador)
     {
-        $estabelecimentos = Cache::get('estabelecimentos')["registrosRedesim"]["registroRedesim"];
-        $estabelecimento = collect($estabelecimentos)->firstWhere('identificador', $identificador);
-        if ($estabelecimento) {
-            Log::info("Estabelecimento encontrado no cache geral para o Identificador: $identificador.");
-            $dto = new EstabelecimentoDTO($estabelecimento["dadosRedesim"]);
-            return new Estabelecimento((array) $dto);
-        }
-        $data = $this->getCachedData(
-            "estabelecimento_{$identificador}",
-            self::BASE_URL . '/wsE013/recuperaEstabelecimentoPorIdentificador',
-            ['identificador' => $identificador]
-        );
-    
-        $dto = new EstabelecimentoDTO($data);
-        return new Estabelecimento((array) $dto);
+        // Busca diretamente no banco de dados
+        return Estabelecimento::where('identificador', $identificador)->first();
     }
 
     public function informaRecebimento(array $identificadores)
@@ -97,19 +95,14 @@ class EstabelecimentoService
     {
         try {
             $data = Cache::get($cacheKey);
-            //dd($data["registrosRedesim"]["registroRedesim"]["0"]["eventos"]["evento"]["0"]["codEvento"]);
-            // $identificadores = collect(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"])->pluck('identificador')->all();
-            //dd($data);
-
             if ($data) {
                 Log::info("Dados encontrados no cache para a chave: $cacheKey.");
                 return $data;
             }
-
             Log::info("Dados não encontrados no cache para a chave: $cacheKey. Fazendo requisição HTTP...");
-
-            $response = Http::post($url, array_merge($payload, $this->getAuthCredentials()));
-
+            // $response = Http::post($url, array_merge($payload, $this->getAuthCredentials()));
+            // Desativando a verificação SSL
+            $response = Http::withoutVerifying()->post($url, array_merge($payload, $this->getAuthCredentials()));
             if ($response->successful()) {
                 $data = $response->json();
                 if (is_callable($callback)) {
@@ -122,7 +115,6 @@ class EstabelecimentoService
                     // Extrai os identificadores
                     $identificadores = collect(Cache::get($cacheKey)["registrosRedesim"]["registroRedesim"])->pluck('identificador')->all();
                     if (!empty($identificadores)) {
-                        //dd($identificadores);
                         // Chama o método informaRecebimento com os identificadores
                         $this->informaRecebimento($identificadores); // This is now called only after a successful response
                     }

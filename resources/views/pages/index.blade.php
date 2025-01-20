@@ -29,5 +29,6 @@
     ou Atualizadas</h1>
 <div>
     @livewire('estabelecimentos-table')
+    @livewire('estabelecimento-detalhes')
 </div>
 @endsection

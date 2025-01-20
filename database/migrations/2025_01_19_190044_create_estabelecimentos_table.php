@@ -4,20 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEstabelecimentosTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('estabelecimentos', function (Blueprint $table) {
             $table->id();
             $table->string('cnpj')->unique();
             $table->string('nomeEmpresarial');
             $table->string('nomeFantasia')->nullable();
+            $table->string('nomeResponsavel')->nullable();
+            $table->string('codEvento')->nullable();
+            $table->string('identificador')->nullable();
             $table->date('dataAberturaEstabelecimento')->nullable();
             $table->date('dataAberturaEmpresa')->nullable();
             $table->date('dataInicioAtividade')->nullable();
@@ -27,7 +28,7 @@ class CreateEstabelecimentosTable extends Migration
             $table->string('porte')->nullable();
             $table->string('nuInscricaoMunicipal')->nullable();
             $table->decimal('capitalSocial', 15, 2)->nullable();
-            $table->boolean('possuiEstabelecimento')->nullable();
+            $table->boolean('possuiEstabelecimento')->default(false);
             $table->string('ultimaViabilidadeVinculada')->nullable();
             $table->string('ultimaViabilidadeAnaliseEndereco')->nullable();
             $table->date('dataUltimaAnaliseEndereco')->nullable();
@@ -46,11 +47,9 @@ class CreateEstabelecimentosTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('estabelecimentos');
     }
-}
+};

@@ -7,6 +7,9 @@ class EstabelecimentoDTO
     public $cnpj;
     public $nomeEmpresarial;
     public $nomeFantasia;
+    public $codEvento;
+    public $identificador;
+    public $nomeResponsavel;
     public $dataAberturaEstabelecimento;
     public $dataAberturaEmpresa;
     public $dataInicioAtividade;
@@ -29,15 +32,19 @@ class EstabelecimentoDTO
     public $endereco_bairro;
     public $endereco_codMunicipio;
     public $endereco_uf;
-    public $contato_ddd;
-    public $contato_telefone1;
-    public $contato_email;
 
-    public function __construct(array $data)
+    public function __construct(array $alldata)
     {
+        $data = $alldata['dadosRedesim'];
+        //dd($alldata);
+        $codEvento = $alldata['eventos']['evento']['0']['codEvento'];
+        $identificador = $alldata['identificador'];
         $this->cnpj = $data['cnpj'] ?? 'Campo não informado';
         $this->nomeEmpresarial = $data['nomeEmpresarial'] ?? 'Campo não informado';
+        $this->codEvento = $codEvento ?? 'Campo não informado';
+        $this->identificador = $identificador ?? 'Campo não informado';
         $this->nomeFantasia = $data['nomeFantasia'] ?? 'Campo não informado';
+        $this->nomeResponsavel = $data['responsavelPeranteCnpj']['nomeResponsavel'] ?? 'Campo não informado'; 
         $this->dataAberturaEstabelecimento = $data['dataAberturaEstabelecimento'] ?? 'Campo não informado';
         $this->dataAberturaEmpresa = $data['dataAberturaEmpresa'] ?? 'Campo não informado';
         $this->dataInicioAtividade = $data['dataInicioAtividade'] ?? 'Campo não informado';

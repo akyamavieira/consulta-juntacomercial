@@ -29,7 +29,6 @@
     Cadastradas
     ou Atualizadas</h1>
 <div>
-    @livewire('atualizar-estabelecimentos-button')
     @livewire('estabelecimentos-table')
     @livewire('estabelecimento-detalhes')
 </div>

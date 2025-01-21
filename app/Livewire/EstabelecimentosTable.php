@@ -17,7 +17,7 @@ class EstabelecimentosTable extends Component
     public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['estabelecimentos-atualizados' => '$refresh'];
+    protected $listeners = ['refreshTable' => '$refresh'];
 
     private $estabelecimentoService;
 
@@ -26,6 +26,7 @@ class EstabelecimentosTable extends Component
         \Log::info('Mount do componente EstabelecimentosTable iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
         \Log::info('Serviço de Estabelecimento injetado: ' . get_class($this->estabelecimentoService));
+        $this->estabelecimentoService->getEstabelecimentos();
     }
 
 
@@ -252,7 +253,7 @@ class EstabelecimentosTable extends Component
 
     public function getEstabelecimentosProperty()
     {
-        return Estabelecimento::paginate(10); // Use 10 itens por página
+        return Estabelecimento::whereNotNull('cnpj')->paginate(10);
     }
     public function render()
     {

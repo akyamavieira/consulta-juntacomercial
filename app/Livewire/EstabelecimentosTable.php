@@ -17,7 +17,7 @@ class EstabelecimentosTable extends Component
     public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['refreshTable' => 'loadEstabelecimentos'];
+    protected $listeners = ['refreshTable' => '$refresh'];
 
     private $estabelecimentoService;
 
@@ -237,12 +237,6 @@ class EstabelecimentosTable extends Component
         ];
         // Verificar se o código do evento existe no array
         $this->tooltipMessage = $eventos[$codEvento] ?? 'Código de evento desconhecido';
-    }
-    public function loadEstabelecimentos()
-    {
-        \Log::info('Método loadEstabelecimentos chamado.');
-        $this->estabelecimentoService->getEstabelecimentos();
-        $this->resetPage();
     }
     public function esconderTooltip()
     {

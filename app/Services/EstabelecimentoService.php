@@ -28,23 +28,17 @@ class EstabelecimentoService
         );
 
         $estabelecimentosDTO = collect($data['registrosRedesim']['registroRedesim'] ?? [])
-            ->map(function ($item) {
-                return new EstabelecimentoDTO($item);
-            });
+            ->filter(fn($item) => isset($item['cnpj'])) // Apenas registros válidos
+            ->map(fn($item) => new EstabelecimentoDTO($item));
 
-        $estabelecimentos = $estabelecimentosDTO->map(function ($dto) {
+        $estabelecimentosDTO->each(function ($dto) {
             $existingEstabelecimento = Estabelecimento::where('cnpj', $dto->cnpj)->first();
             if ($existingEstabelecimento) {
                 $existingEstabelecimento->update((array) $dto);
-                return $existingEstabelecimento;
             } else {
-                $estabelecimento = new Estabelecimento((array) $dto);
-                $estabelecimento->save();
-                return $estabelecimento;
+                Estabelecimento::create((array) $dto);
             }
         });
-
-        return $estabelecimentos;
     }
 
     public function getEstabelecimentoPorIdentificador(string $identificador)

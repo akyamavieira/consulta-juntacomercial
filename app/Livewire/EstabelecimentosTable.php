@@ -29,6 +29,7 @@ class EstabelecimentosTable extends Component
         // Chama o método getEstabelecimentos para carregar e persistir os dados
         $this->estabelecimentoService->getEstabelecimentos();
         $this->resetPage();
+        $this->refreshTable();
     }
 
     public function mostrarTooltip($identificador, $codEvento)
@@ -262,6 +263,10 @@ class EstabelecimentosTable extends Component
         if ($name === 'page') {
             $this->resetPage();
         }
+    }
+    public function refreshTable()
+    {
+        $this->dispatch('$refresh');
     }
     public function render()
     {

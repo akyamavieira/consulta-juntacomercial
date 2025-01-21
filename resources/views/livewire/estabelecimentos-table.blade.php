@@ -1,5 +1,5 @@
 <div class="flex flex-col items-center justify-center">
-    <table class="border border-gray-200 rounded-3xl overflow-hidden">
+    <table class="border border-gray-200 rounded-3xl overflow-visible relative">
         <thead>
             <tr class="bg-gray-100 text-left">
                 <th class="px-3 py-3 text-sm font-medium text-gray-600">Empresa</th>
@@ -24,15 +24,16 @@
                             {{ $estabelecimento->codEvento }}
                         </span>
                         @if($tooltipIdentificador === $estabelecimento->identificador)
-                            <div class="absolute z-10 mt-1 p-2 bg-gray-800 text-white text-sm rounded shadow-lg">
+                            <div class="absolute z-20 mt-1 p-2 bg-gray-800 text-white text-sm rounded shadow-lg">
                                 {{ $tooltipMessage }}
                             </div>
                         @endif
                     </td>
                     <td class="px-3 py-3">
                         <button wire:click="mostrarDetalhes('{{ $estabelecimento->identificador }}')"
-                            class="text-blue-500 hover:text-blue-700"><img src="{{ asset('img/ver-detalhes.svg') }}"
-                                alt="Ver Detalhes" class="h-5 w-5 text-blue-500" />
+                            class="text-blue-500 hover:text-blue-700">
+                            <img src="{{ asset('img/ver-detalhes.svg') }}" alt="Ver Detalhes"
+                                class="h-5 w-5 text-blue-500" />
                         </button>
                     </td>
                 </tr>

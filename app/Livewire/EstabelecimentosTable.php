@@ -28,8 +28,6 @@ class EstabelecimentosTable extends Component
         \Log::info('Serviço de Estabelecimento injetado: ' . get_class($this->estabelecimentoService));
         // Chama o método getEstabelecimentos para carregar e persistir os dados
         $this->estabelecimentoService->getEstabelecimentos();
-        $this->resetPage();
-        $this->refreshTable();
     }
 
     public function mostrarTooltip($identificador, $codEvento)
@@ -257,16 +255,6 @@ class EstabelecimentosTable extends Component
     public function getEstabelecimentosProperty()
     {
         return Estabelecimento::paginate(10); // Use 10 itens por página
-    }
-    public function updating($name)
-    {
-        if ($name === 'page') {
-            $this->resetPage();
-        }
-    }
-    public function refreshTable()
-    {
-        $this->dispatch('$refresh');
     }
     public function render()
     {

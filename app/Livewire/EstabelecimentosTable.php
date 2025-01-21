@@ -21,9 +21,9 @@ class EstabelecimentosTable extends Component
 
     private $estabelecimentoService;
 
-    public function mount(EstabelecimentoService $estabelecimentoService)
+    public function boot(EstabelecimentoService $estabelecimentoService)
     {
-        \Log::info('Mount do componente EstabelecimentosTable iniciado.');
+        \Log::info('Boot do componente EstabelecimentosTable iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
         \Log::info('Serviço de Estabelecimento injetado: ' . get_class($this->estabelecimentoService));
         // Chama o método getEstabelecimentos para carregar e persistir os dados

@@ -6,6 +6,7 @@ use App\Services\EstabelecimentoService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Estabelecimento;
+use Illuminate\Support\Facades\Schema;
 
 class EstabelecimentosTable extends Component
 {
@@ -253,7 +254,9 @@ class EstabelecimentosTable extends Component
 
     public function getEstabelecimentosProperty()
     {
-        return Estabelecimento::whereNotNull('cnpj')->paginate(10);
+        if (Schema::hasColumn('estabelecimentos', 'cnpj')) {
+            return Estabelecimento::paginate(10);
+        }
     }
     public function render()
     {

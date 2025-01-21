@@ -257,7 +257,12 @@ class EstabelecimentosTable extends Component
     {
         return Estabelecimento::paginate(10); // Use 10 itens por página
     }
-
+    public function updating($name)
+    {
+        if ($name === 'page') {
+            $this->resetPage();
+        }
+    }
     public function render()
     {
         return view('livewire.estabelecimentos-table', [

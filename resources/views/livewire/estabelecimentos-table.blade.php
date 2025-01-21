@@ -40,5 +40,8 @@
         </tbody>
     </table>
     <!-- Pagination Links -->
+    <div class="mt-4">
+        {{ $estabelecimentos->links() }}
+    </div> 
 
 </div>

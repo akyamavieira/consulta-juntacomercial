@@ -17,18 +17,17 @@ class EstabelecimentosTable extends Component
     public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['refreshTable' => '$refresh'];
+    protected $listeners = ['refreshTable' => 'loadEstabelecimentos'];
 
     private $estabelecimentoService;
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    public function mount(EstabelecimentoService $estabelecimentoService)
     {
-        \Log::info('Boot do componente EstabelecimentosTable iniciado.');
+        \Log::info('Mount do componente EstabelecimentosTable iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
         \Log::info('Serviço de Estabelecimento injetado: ' . get_class($this->estabelecimentoService));
-        // Chama o método getEstabelecimentos para carregar e persistir os dados
-        $this->estabelecimentoService->getEstabelecimentos();
     }
+
 
     public function mostrarTooltip($identificador, $codEvento)
     {
@@ -239,7 +238,12 @@ class EstabelecimentosTable extends Component
         // Verificar se o código do evento existe no array
         $this->tooltipMessage = $eventos[$codEvento] ?? 'Código de evento desconhecido';
     }
-
+    public function loadEstabelecimentos()
+    {
+        \Log::info('Método loadEstabelecimentos chamado.');
+        $this->estabelecimentoService->getEstabelecimentos();
+        $this->resetPage();
+    }
     public function esconderTooltip()
     {
         $this->tooltipIdentificador = null;

@@ -1,4 +1,10 @@
 <div class="flex flex-col items-center justify-center">
+    <div class="flex justify-center mb-4">
+        <button wire:click="loadEstabelecimentos"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Atualizar Estabelecimentos
+        </button>
+    </div>
     <table class="border border-gray-200 rounded-3xl overflow-hidden">
         <thead>
             <tr class="bg-gray-100 text-left">
@@ -42,6 +48,6 @@
     <!-- Pagination Links -->
     <div class="mt-4">
         {{ $estabelecimentos->links() }}
-    </div> 
+    </div>
 
 </div>

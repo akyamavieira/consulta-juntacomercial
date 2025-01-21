@@ -21,7 +21,7 @@ class EstabelecimentosTable extends Component
 
     private $estabelecimentoService;
 
-    public function mount(EstabelecimentoService $estabelecimentoService)
+    public function boot(EstabelecimentoService $estabelecimentoService)
     {
         \Log::info('Mount do componente EstabelecimentosTable iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
@@ -246,6 +246,7 @@ class EstabelecimentosTable extends Component
     public function loadEstabelecimentos()
     {
         \Log::info('Método loadEstabelecimentos chamado.');
+        //dd($this->estabelecimentoService);
         $newData = $this->estabelecimentoService->getEstabelecimentos();
         if ($newData->isNotEmpty()) {
             $this->resetPage();
@@ -263,7 +264,7 @@ class EstabelecimentosTable extends Component
 
     public function getEstabelecimentosProperty()
     {
-        return Estabelecimento::paginate(50); // Use 10 itens por página
+        return Estabelecimento::paginate(10); // Use 10 itens por página
     }
     public function render()
     {

@@ -254,7 +254,7 @@ class EstabelecimentosTable extends Component
 
     public function getEstabelecimentosProperty()
     {
-        return Estabelecimento::paginate(10); // Use 10 itens por página
+        return Estabelecimento::all(); // Use 10 itens por página
     }
 
     public function render()

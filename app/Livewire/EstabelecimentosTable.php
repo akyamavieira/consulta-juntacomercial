@@ -17,7 +17,7 @@ class EstabelecimentosTable extends Component
     public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['refreshTable' => '$refresh'];
+    protected $listeners = ['refreshTable' => 'loadEstabelecimentos'];
 
     private $estabelecimentoService;
 
@@ -242,6 +242,13 @@ class EstabelecimentosTable extends Component
     {
         $this->tooltipIdentificador = null;
         $this->tooltipMessage = null;
+    }
+    public function loadEstabelecimentos()
+    {
+        \Log::info('Método loadEstabelecimentos chamado.');
+        $this->estabelecimentoService->getEstabelecimentos();
+        $this->resetPage();
+        $this->dispatch('$refresh');
     }
     public function mostrarDetalhes($identificador)
     {

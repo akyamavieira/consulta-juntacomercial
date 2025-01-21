@@ -23,6 +23,7 @@ class EstabelecimentoDetalhes extends Component
     {
         \Log::info('Método mostrarDetalhes ouvindo.');
         // Busca os detalhes do estabelecimento pelo identificador
+        $this->estabelecimentoService->getEstabelecimentos();
         $this->detalhesEstabelecimento = $this->estabelecimentoService->getEstabelecimentoPorIdentificador($identificador);
         //dd($this->detalhesEstabelecimento);
         // Verifica se os detalhes foram carregados corretamente

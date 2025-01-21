@@ -17,11 +17,11 @@ class EstabelecimentosTable extends Component
     public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['refreshTable' => 'loadEstabelecimentos'];
+    protected $listeners = ['estabelecimentos-atualizados' => '$refresh'];
 
     private $estabelecimentoService;
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    public function mount(EstabelecimentoService $estabelecimentoService)
     {
         \Log::info('Mount do componente EstabelecimentosTable iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
@@ -242,18 +242,6 @@ class EstabelecimentosTable extends Component
     {
         $this->tooltipIdentificador = null;
         $this->tooltipMessage = null;
-    }
-    public function loadEstabelecimentos()
-    {
-        \Log::info('Método loadEstabelecimentos chamado.');
-        //dd($this->estabelecimentoService);
-        $newData = $this->estabelecimentoService->getEstabelecimentos();
-        if ($newData->isNotEmpty()) {
-            $this->resetPage();
-            $this->dispatch('$refresh');
-        } else {
-            \Log::info('Nenhum novo dado retornado pelo método getEstabelecimentos.');
-        }
     }
     public function mostrarDetalhes($identificador)
     {

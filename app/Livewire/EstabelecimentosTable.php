@@ -28,7 +28,7 @@ class EstabelecimentosTable extends Component
         \Log::info('Serviço de Estabelecimento injetado: ' . get_class($this->estabelecimentoService));
         // Chama o método getEstabelecimentos para carregar e persistir os dados
         $this->estabelecimentoService->getEstabelecimentos();
-        $this->dispatch('refreshTable');
+        $this->resetPage();
     }
 
     public function mostrarTooltip($identificador, $codEvento)

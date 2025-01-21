@@ -17,7 +17,7 @@ class EstabelecimentosTable extends Component
     public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['refreshTable' => 'loadEstabelecimentos'];
+    protected $listeners = ['refreshTable' => '$refresh'];
 
     private $estabelecimentoService;
 
@@ -243,13 +243,6 @@ class EstabelecimentosTable extends Component
         $this->tooltipIdentificador = null;
         $this->tooltipMessage = null;
     }
-    public function loadEstabelecimentos()
-    {
-        \Log::info('Método loadEstabelecimentos chamado.');
-        $this->estabelecimentoService->getEstabelecimentos();
-        $this->resetPage();
-        $this->dispatch('$refresh');
-    }
     public function mostrarDetalhes($identificador)
     {
         \Log::info('Método mostrarDetalhes chamado.');
@@ -259,7 +252,7 @@ class EstabelecimentosTable extends Component
 
     public function getEstabelecimentosProperty()
     {
-        return Estabelecimento::paginate(10); // Use 10 itens por página
+        return Estabelecimento::paginate(50); // Use 10 itens por página
     }
     public function render()
     {

@@ -16,7 +16,7 @@ class Logout extends Component
         Session::invalidate();
 
         // Defina o redirecionamento conforme o padrão aceito pelo Keycloak
-        $postLogoutRedirectUri = 'https://consulta-jucerr-homolog.rr.sebrae.com.br/index';
+        $postLogoutRedirectUri = 'https://consulta-jucerr-homolog.rr.sebrae.com.br';
 
         // Construa a URL de logout do Keycloak com o parâmetro correto
         $keycloakLogoutUrl = sprintf(

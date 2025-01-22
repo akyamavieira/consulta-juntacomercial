@@ -11,24 +11,22 @@ class Logout extends Component
 
     public function logout(Request $request)
     {
-        $idToken = Session::get('id_token');
         // Remove o usuário da sessão
         Session::forget('user');
-        Session::forget('id_token');
         Session::invalidate();
 
-        // URL absoluta para redirecionar após o logout
-        $redirectUri = 'https://consulta-jucerr-homolog.rr.sebrae.com.br';
+        // Defina o redirecionamento conforme o padrão aceito pelo Keycloak
+        $postLogoutRedirectUri = 'https://consulta-jucerr-homolog.rr.sebrae.com.br/index';
 
-        // URL de logout do Keycloak com id_token_hint
+        // Construa a URL de logout do Keycloak com o parâmetro correto
         $keycloakLogoutUrl = sprintf(
-            'https://lus-homolog.rr.sebrae.com.br/realms/sebrae-corporate-homolog/protocol/openid-connect/logout?id_token_hint=%s&post_logout_redirect_uri=%s',
-            urlencode($idToken), // Inclui o ID Token
-            urlencode($redirectUri) // Codifica a URL de redirecionamento
+            'https://lus-homolog.rr.sebrae.com.br/realms/sebrae-corporate-homolog/protocol/openid-connect/logout?post_logout_redirect_uri=%s&client_id=%s',
+            urlencode($postLogoutRedirectUri), // Deve corresponder ao padrão configurado no Keycloak
+            'consulta-jucerr' // Substitua pelo Client ID correto
         );
 
-
-        return redirect()->away($keycloakLogoutUrl);
+        // Redireciona para o logout do Keycloak
+        return redirect($keycloakLogoutUrl);
     }
     public function render()
     {

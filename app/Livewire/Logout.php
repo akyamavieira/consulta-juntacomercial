@@ -21,10 +21,10 @@ class Logout extends Component
         // URL de logout do Keycloak
         $keycloakLogoutUrl = sprintf(
             'https://lus-homolog.rr.sebrae.com.br/realms/sebrae-corporate-homolog/protocol/openid-connect/logout?redirect_uri=%s',
-            urlencode($redirectUri) // Substitua pela URL absoluta
+            urlencode($redirectUri) // Codifica a URL de redirecionamento
         );
 
-        return redirect($keycloakLogoutUrl);
+        return redirect()->away($keycloakLogoutUrl);
     }
     public function render()
     {

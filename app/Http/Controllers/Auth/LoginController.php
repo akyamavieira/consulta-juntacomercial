@@ -43,9 +43,9 @@ class LoginController extends Controller
     }
     public function backchannelLogout(Request $request)
     {
-        // Lógica para processar o logout backchannel
-        // Por exemplo, invalidar a sessão do usuário
-        Auth::logout();
+        // Remover o usuário da sessão
+        Session::forget('user');
+        Session::invalidate();
         return response()->json(['message' => 'Logout successful'], 200);
     }
 }

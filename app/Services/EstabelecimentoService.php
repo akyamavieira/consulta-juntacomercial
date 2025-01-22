@@ -16,6 +16,7 @@ class EstabelecimentoService
 
     public function getEstabelecimentos()
     {
+
         $data = $this->fetchData(
             self::BASE_URL . '/wsE013/recuperaEstabelecimentos',
             [
@@ -39,6 +40,11 @@ class EstabelecimentoService
                 Estabelecimento::create((array) $dto);
             }
         });
+        $identificadores = $estabelecimentosDTO->pluck('identificador')->toArray();
+        if (!empty($identificadores)){
+            dd($identificadores);
+            $this->informaRecebimento($identificadores);
+        }
     }
 
     public function getEstabelecimentoPorIdentificador(string $identificador)

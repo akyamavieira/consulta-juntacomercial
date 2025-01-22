@@ -36,7 +36,6 @@ class LoginController extends Controller
         $driver->setHttpClient($guzzleClient);
         $user = $driver->stateless()->user();
         Session::put('user',$user);
-        Session::put('id_token', $user->token); // Armazena o ID Token na sessão
     
 
         // Redireciona para a rota principal após o login
@@ -46,7 +45,6 @@ class LoginController extends Controller
     {
         // Remover o usuário da sessão
         Session::forget('user');
-        Session::forget('id_token');
         Session::invalidate();
         return response()->json(['message' => 'Logout successful'], 200);
     }

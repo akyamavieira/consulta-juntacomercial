@@ -28,21 +28,29 @@ class EstabelecimentoService
             }
         );
 
-        $estabelecimentosDTO = collect($data['registrosRedesim']['registroRedesim'] ?? [])
-            ->filter(fn($item) => isset($item['cnpj'])) // Apenas registros válidos
-            ->map(fn($item) => new EstabelecimentoDTO($item));
+        $estabelecimentosDTO = collect(
+            isset($data['registrosRedesim']['registroRedesim']) && is_array($data['registrosRedesim']['registroRedesim'])
+            ? $data['registrosRedesim']['registroRedesim']
+            : []
+        )->map(fn($item) => new EstabelecimentoDTO($item));
 
         $estabelecimentosDTO->each(function ($dto) {
+            // Verifica se já existe um registro com o mesmo CNPJ no banco
             $existingEstabelecimento = Estabelecimento::where('cnpj', $dto->cnpj)->first();
+        
             if ($existingEstabelecimento) {
+                // Atualiza o registro existente com os dados do DTO
                 $existingEstabelecimento->update((array) $dto);
+                Log::info("Estabelecimento com CNPJ {$dto->cnpj} atualizado.");
             } else {
+                // Cria um novo registro no banco com o DTO diretamente
                 Estabelecimento::create((array) $dto);
+                Log::info("Novo Estabelecimento criado com CNPJ {$dto->cnpj}.");
             }
         });
+        
         $identificadores = $estabelecimentosDTO->pluck('identificador')->toArray();
-        if (!empty($identificadores)){
-            dd($identificadores);
+        if (!empty($identificadores)) {
             $this->informaRecebimento($identificadores);
         }
     }

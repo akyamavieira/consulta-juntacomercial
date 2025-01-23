@@ -19,8 +19,8 @@
                     </td>
                     <td class="px-3 py-3 text-sm text-gray-800 relative">
                         <span
-                            wire:mouseover="$dispatch('mostrarTooltip', { identificador: '{{ $estabelecimento->identificador }}', codEvento: '{{ $estabelecimento->codEvento }}' })"
-                            wire:mouseout="$dispatch('esconderTooltip')" class="cursor-pointer">
+                            wire:click="$dispatch('showTooltip', { identificador: '{{ $estabelecimento->identificador }}', codEvento: '{{ $estabelecimento->codEvento }}' })"
+                            class="cursor-pointer">
                             {{ $estabelecimento->codEvento }}
                         </span>
                         <livewire:tooltip :identificador="$estabelecimento->identificador" :codEvento="$estabelecimento->codEvento" />

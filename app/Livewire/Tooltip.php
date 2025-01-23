@@ -11,6 +11,7 @@ class Tooltip extends Component
     public $identificador;
     public $codEvento;
     public $message;
+    public $isVisible = false;
 
     private EventosService $eventosService;
 
@@ -25,19 +26,20 @@ class Tooltip extends Component
         $this->codEvento = $codEvento;
     }
 
-    #[On('mostrarTooltip')]
-    public function mostrarTooltip($identificador, $codEvento)
+    protected $listeners = ['showTooltip' => 'showTooltip', 'hideTooltip' => 'hideTooltip'];
+
+    public function showTooltip($identificador, $codEvento)
     {
         if ($this->identificador === $identificador) {
             $this->codEvento = $codEvento;
             $this->loadTooltipMessage();
+            $this->isVisible = true;
         }
     }
 
-    #[On('esconderTooltip')]
-    public function esconderTooltip()
+    public function hideTooltip()
     {
-        $this->message = null;
+        $this->isVisible = false;
     }
 
     public function loadTooltipMessage()
@@ -53,8 +55,6 @@ class Tooltip extends Component
 
     public function render()
     {
-        return view('livewire.tooltip', [
-            'message' => $this->message,
-        ]);
+        return view('livewire.tooltip');
     }
 }

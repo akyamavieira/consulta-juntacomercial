@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Livewire;
-
-use App\Services\EstabelecimentoService;
 use App\Services\EventosService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -23,11 +21,7 @@ class EstabelecimentosTable extends Component
     private $estabelecimentoService;
     private $eventosService;
 
-    public function mount()
-    {
-        \Log::info('Carregando estabelecimentos na inicialização do componente.');
-        $this->getEstabelecimentoService()->getEstabelecimentos();
-    }
+
     public function mostrarTooltip($identificador, $codEvento)
     {
         $this->tooltipIdentificador = $identificador;
@@ -61,16 +55,6 @@ class EstabelecimentosTable extends Component
     {
         \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
         return Estabelecimento::paginate(10);
-    }
-
-    // Métodos de Lazy Loading dos Serviços
-    protected function getEstabelecimentoService()
-    {
-        if (!$this->estabelecimentoService) {
-            \Log::info('Inicializando EstabelecimentoService.');
-            $this->estabelecimentoService = app(EstabelecimentoService::class);
-        }
-        return $this->estabelecimentoService;
     }
 
     protected function getEventosService()

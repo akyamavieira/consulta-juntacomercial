@@ -19,15 +19,11 @@
                     </td>
                     <td class="px-3 py-3 text-sm text-gray-800 relative">
                         <span
-                            wire:mouseover="mostrarTooltip('{{ $estabelecimento->identificador }}','{{ $estabelecimento->codEvento }}')"
-                            wire:mouseout="esconderTooltip" class="cursor-pointer">
+                            wire:mouseover="$dispatch('mostrarTooltip', { identificador: '{{ $estabelecimento->identificador }}', codEvento: '{{ $estabelecimento->codEvento }}' })"
+                            wire:mouseout="$dispatch('esconderTooltip')" class="cursor-pointer">
                             {{ $estabelecimento->codEvento }}
                         </span>
-                        @if($tooltipIdentificador === $estabelecimento->identificador)
-                            <div class="absolute z-20 mt-1 p-2 bg-gray-800 text-white text-sm rounded shadow-lg">
-                                {{ $tooltipMessage }}
-                            </div>
-                        @endif
+                        <livewire:tooltip :identificador="$estabelecimento->identificador" :codEvento="$estabelecimento->codEvento" />
                     </td>
                     <td class="px-3 py-3">
                         <button wire:click="mostrarDetalhes('{{ $estabelecimento->identificador }}')"
@@ -44,5 +40,4 @@
     <div class="mt-4">
         {{ $estabelecimentos->links() }}
     </div>
-
 </div>

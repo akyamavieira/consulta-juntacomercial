@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Livewire;
+
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Estabelecimento;
-use App\Services\EventosService;
 
 class EstabelecimentosTable extends Component
 {
@@ -12,41 +12,9 @@ class EstabelecimentosTable extends Component
 
     public $detalhesEstabelecimento;
     public $mostrarModal = false;
-    public $tooltipIdentificador = null;
-    public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['refreshTable' => '$refresh', 'mostrarTooltip'];
-
-    private $eventosService;
-
-    public function boot(EventosService $eventosService)
-    {
-        $this->eventosService = $eventosService;
-    }
-
-    public function mostrarTooltip($identificador, $codEvento)
-    {
-        $this->tooltipIdentificador = $identificador;
-
-        \Log::info('mostrarTooltip chamado com identificador: ' . $identificador . ', codEvento: ' . $codEvento);
-
-        try {
-            $descricao = $this->eventosService->getDescricao($codEvento);
-            $this->tooltipMessage = $descricao ?? 'Código de evento desconhecido';
-            \Log::info('Descrição do evento carregada: ' . ($descricao ?? 'Descrição desconhecida'));
-        } catch (\Exception $e) {
-            \Log::error('Erro ao carregar EventosService: ' . $e->getMessage());
-            $this->tooltipMessage = 'Serviço de eventos não disponível';
-        }
-    }
-
-    public function esconderTooltip()
-    {
-        \Log::info('esconderTooltip chamado.');
-        $this->tooltipIdentificador = null;
-        $this->tooltipMessage = null;
-    }
+    protected $listeners = ['refreshTable' => '$refresh'];
 
     public function mostrarDetalhes($identificador)
     {

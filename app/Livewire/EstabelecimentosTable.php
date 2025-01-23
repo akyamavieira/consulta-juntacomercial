@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Livewire;
-use App\Services\EventosService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Estabelecimento;
+use App\Services\EventosService;
 
 class EstabelecimentosTable extends Component
 {
@@ -16,11 +16,14 @@ class EstabelecimentosTable extends Component
     public $tooltipMessage = null;
     protected $paginationTheme = 'tailwind';
 
-    protected $listeners = ['refreshTable' => '$refresh'];
+    protected $listeners = ['refreshTable' => '$refresh', 'mostrarTooltip'];
 
-    private $estabelecimentoService;
     private $eventosService;
 
+    public function boot(EventosService $eventosService)
+    {
+        $this->eventosService = $eventosService;
+    }
 
     public function mostrarTooltip($identificador, $codEvento)
     {
@@ -29,7 +32,7 @@ class EstabelecimentosTable extends Component
         \Log::info('mostrarTooltip chamado com identificador: ' . $identificador . ', codEvento: ' . $codEvento);
 
         try {
-            $descricao = $this->getEventosService()->getDescricao($codEvento);
+            $descricao = $this->eventosService->getDescricao($codEvento);
             $this->tooltipMessage = $descricao ?? 'Código de evento desconhecido';
             \Log::info('Descrição do evento carregada: ' . ($descricao ?? 'Descrição desconhecida'));
         } catch (\Exception $e) {
@@ -55,15 +58,6 @@ class EstabelecimentosTable extends Component
     {
         \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
         return Estabelecimento::paginate(10);
-    }
-
-    protected function getEventosService()
-    {
-        if (!$this->eventosService) {
-            \Log::info('Inicializando EventosService.');
-            $this->eventosService = app(EventosService::class);
-        }
-        return $this->eventosService;
     }
 
     public function render()

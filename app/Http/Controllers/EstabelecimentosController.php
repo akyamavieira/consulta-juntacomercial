@@ -20,8 +20,6 @@ class EstabelecimentosController extends Controller
         \Log::info('Carregando estabelecimentos no Controller.');
         $estabelecimentos = $this->estabelecimentoService->getEstabelecimentos();
 
-        return view('pages.index', [
-            'estabelecimentos' => $estabelecimentos,
-        ]);
+        return view('pages.index');
     }
 }

@@ -17,13 +17,8 @@
                     <td class="px-3 py-3 text-sm text-gray-800 max-w-28 md:max-w-full">
                         {{ $estabelecimento->nomeResponsavel }}
                     </td>
-                    <td class="px-3 py-3 text-sm text-gray-800 relative">
-                        <span
-                            wire:click="$dispatch('showTooltip', { identificador: '{{ $estabelecimento->identificador }}', codEvento: '{{ $estabelecimento->codEvento }}' })"
-                            class="cursor-pointer">
-                            {{ $estabelecimento->codEvento }}
-                        </span>
-                        <livewire:tooltip :identificador="$estabelecimento->identificador" :codEvento="$estabelecimento->codEvento" />
+                    <td class="px-3 py-3 text-sm text-gray-800">
+                        {{ $estabelecimento->codEvento }}
                     </td>
                     <td class="px-3 py-3">
                         <button wire:click="mostrarDetalhes('{{ $estabelecimento->identificador }}')"

@@ -37,6 +37,7 @@
                             </a>
                         </p>
                     </li>
+                    <li><strong>Descrição do Evento:</strong> {{ $eventoDescricao }}</li>
                 </ul>
 
                 <button wire:click="fecharModal" class="mt-4 px-4 py-2 bg-red-500 text-white rounded">Fechar</button>

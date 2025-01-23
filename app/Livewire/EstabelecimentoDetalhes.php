@@ -4,18 +4,22 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Services\EstabelecimentoService;
+use App\Services\EventosService;
 
 class EstabelecimentoDetalhes extends Component
 {
     public $detalhesEstabelecimento;
     public $mostrarModal = false;
+    public $eventoDescricao;
     private $estabelecimentoService;
+    private $eventosService;
     protected $listeners = ['mostrarDetalhes'];
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    public function boot(EstabelecimentoService $estabelecimentoService, EventosService $eventosService)
     {
         \Log::info('Boot do componente EstabelecimentoDetalhes iniciado.');
         $this->estabelecimentoService = $estabelecimentoService;
+        $this->eventosService = $eventosService;
     }
 
     #[On('mostrarDetalhes')]
@@ -24,9 +28,9 @@ class EstabelecimentoDetalhes extends Component
         \Log::info('Método mostrarDetalhes ouvindo.');
         // Busca os detalhes do estabelecimento pelo identificador
         $this->detalhesEstabelecimento = $this->estabelecimentoService->getEstabelecimentoPorIdentificador($identificador);
-        //dd($this->detalhesEstabelecimento);
         // Verifica se os detalhes foram carregados corretamente
         if ($this->detalhesEstabelecimento) {
+            $this->eventoDescricao = $this->eventosService->getDescricao($this->detalhesEstabelecimento->codEvento);
             $this->mostrarModal = true;
         }
     }

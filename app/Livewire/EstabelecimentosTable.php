@@ -23,6 +23,11 @@ class EstabelecimentosTable extends Component
     private $estabelecimentoService;
     private $eventosService;
 
+    public function mount()
+    {
+        \Log::info('Carregando estabelecimentos na inicialização do componente.');
+        $this->getEstabelecimentoService()->getEstabelecimentos();
+    }
     public function mostrarTooltip($identificador, $codEvento)
     {
         $this->tooltipIdentificador = $identificador;

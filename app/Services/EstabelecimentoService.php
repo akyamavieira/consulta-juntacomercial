@@ -5,7 +5,6 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use App\DTO\EstabelecimentoDTO;
 use App\Models\Estabelecimento;
-use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Exception;
 use Log;
@@ -48,7 +47,7 @@ class EstabelecimentoService
                 Log::info("Novo Estabelecimento criado com CNPJ {$dto->cnpj}.");
             }
         });
-        
+
         $identificadores = $estabelecimentosDTO->pluck('identificador')->toArray();
         if (!empty($identificadores)) {
             $this->informaRecebimento($identificadores);

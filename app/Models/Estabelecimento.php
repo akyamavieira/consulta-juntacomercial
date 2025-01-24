@@ -35,5 +35,6 @@ class Estabelecimento extends Model
         'endereco_bairro',
         'endereco_codMunicipio',
         'endereco_uf',
+        'is_novo',
     ];
 }

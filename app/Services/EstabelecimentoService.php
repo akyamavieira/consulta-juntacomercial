@@ -36,14 +36,22 @@ class EstabelecimentoService
         $estabelecimentosDTO->each(function ($dto) {
             // Verifica se já existe um registro com o mesmo CNPJ no banco
             $existingEstabelecimento = Estabelecimento::where('cnpj', $dto->cnpj)->first();
-        
+
             if ($existingEstabelecimento) {
+                // Se o registro existe e já está marcado como 'is_novo' => true, marca como false
+                if ($existingEstabelecimento->is_novo) {
+                    $existingEstabelecimento->update(['is_novo' => false]);
+                    Log::info("Estabelecimento com CNPJ {$dto->cnpj} marcado como 'is_novo' => false.");
+                }
                 // Atualiza o registro existente com os dados do DTO
                 $existingEstabelecimento->update((array) $dto);
                 Log::info("Estabelecimento com CNPJ {$dto->cnpj} atualizado.");
             } else {
-                // Cria um novo registro no banco com o DTO diretamente
-                Estabelecimento::create((array) $dto);
+                // Cria um novo registro no banco com o DTO, atribuindo 'is_novo' como true
+                $data = (array) $dto;
+                $data['is_novo'] = true; // Adiciona o campo 'is_novo' como true
+
+                Estabelecimento::create($data);
                 Log::info("Novo Estabelecimento criado com CNPJ {$dto->cnpj}.");
             }
         });

@@ -9,29 +9,49 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($estabelecimentos as $estabelecimento)
-                <tr class="border-t">
-                    <td class="px-3 py-3 text-sm text-gray-800 max-w-36 md:max-w-full">
+            @forelse ($estabelecimentos as $index => $estabelecimento)
+                <tr class="border-t @if ($estabelecimento->is_novo) bg-green-50 @endif">
+                    <!-- Nome da Empresa -->
+                    <td class="px-3 py-3 text-sm text-gray-800 max-w-36 md:max-w-full flex items-center">
                         {{ $estabelecimento->nomeEmpresarial }}
+                        @if ($estabelecimento->is_novo)
+                            <span class="ml-2 text-xs text-white bg-green-500 rounded-full px-2 py-1">
+                                Novo
+                            </span>
+                        @endif
                     </td>
+                    
+                    <!-- Nome do Responsável -->
                     <td class="px-3 py-3 text-sm text-gray-800 max-w-28 md:max-w-full">
                         {{ $estabelecimento->nomeResponsavel }}
                     </td>
+                    
+                    <!-- Status -->
                     <td class="px-3 py-3 text-sm text-gray-800">
                         {{ $estabelecimento->codEvento }}
                     </td>
+                    
+                    <!-- Ação -->
                     <td class="px-3 py-3">
-                        <button wire:click="mostrarDetalhes('{{ $estabelecimento->identificador }}')"
+                        <button 
+                            wire:click="mostrarDetalhes('{{ $estabelecimento->identificador }}')"
                             class="text-blue-500 hover:text-blue-700">
                             <img src="{{ asset('img/ver-detalhes.svg') }}" alt="Ver Detalhes"
                                 class="h-5 w-5 text-blue-500" />
                         </button>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="4" class="px-3 py-3 text-sm text-center text-gray-500">
+                        Nenhum registro encontrado.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
-    <!-- Pagination Links -->
+    
+    <!-- Paginação -->
     <div class="mt-4">
         {{ $estabelecimentos->links() }}
     </div>

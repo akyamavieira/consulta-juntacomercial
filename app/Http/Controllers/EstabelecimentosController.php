@@ -18,7 +18,7 @@ class EstabelecimentosController extends Controller
     public function index(Request $request)
     {
         \Log::info('Carregando estabelecimentos no Controller.');
-        $estabelecimentos = $this->estabelecimentoService->getEstabelecimentos();
+        $this->estabelecimentoService->getEstabelecimentos();
 
         return view('pages.index');
     }

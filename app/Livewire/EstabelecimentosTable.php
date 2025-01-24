@@ -10,7 +10,6 @@ class EstabelecimentosTable extends Component
 {
     use WithPagination;
 
-    public $detalhesEstabelecimento;
     public $mostrarModal = false;
     protected $paginationTheme = 'tailwind';
 

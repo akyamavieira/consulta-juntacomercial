@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Estabelecimento;
+use App\Services\EstabelecimentoService;
 
 class EstabelecimentosTable extends Component
 {
@@ -24,6 +25,8 @@ class EstabelecimentosTable extends Component
     public function getEstabelecimentosProperty()
     {
         \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
+        $estabelecimentos = new EstabelecimentoService;
+        $estabelecimentos->getEstabelecimentos();
         return Estabelecimento::latest()->paginate(10);
     }
 

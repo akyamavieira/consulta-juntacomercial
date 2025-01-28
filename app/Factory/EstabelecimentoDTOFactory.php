@@ -8,6 +8,6 @@ class EstabelecimentoDTOFactory
 {
     public static function createFromApiResponse(array $item): EstabelecimentoDTO
     {
-        return new EstabelecimentoDTO($data);
+        return new EstabelecimentoDTO($item);
     }
 }

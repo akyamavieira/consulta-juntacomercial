@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
-use App\Factory\EstabelecimentoDTO;
+use App\Factory\EstabelecimentoDTOFactory;
 use App\Handlers\RateLimitHandler;
 use App\Repository\EstabelecimentoRepository;
 use Illuminate\Support\Collection;
+use Log;
 
 class EstabelecimentoService
 {

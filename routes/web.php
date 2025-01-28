@@ -7,7 +7,7 @@ use App\Http\Middleware\VerifyKeycloakAuth;
 
 // Rota principal protegida por middleware
 Route::get('/', [EstabelecimentosController::class, 'index'])
-    ->name('index')->middleware(VerifyKeycloakAuth::class);
+    ->name('index');//->middleware(VerifyKeycloakAuth::class);
 
 // Rota de espera (também protegida por middleware)
 Route::get('/wait', function () {

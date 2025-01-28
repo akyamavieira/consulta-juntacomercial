@@ -16,6 +16,11 @@ class EstabelecimentosTable extends Component
 
     protected $listeners = ['refreshTable' => '$refresh'];
 
+    public function boot(EstabelecimentoService $estabelecimentoService)
+    {
+        $this->estabelecimentoService = $estabelecimentoService;
+    }
+
     public function mostrarDetalhes($identificador)
     {
         \Log::info('mostrarDetalhes chamado com identificador: ' . $identificador);
@@ -25,8 +30,8 @@ class EstabelecimentosTable extends Component
     public function getEstabelecimentosProperty()
     {
         \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
-        $estabelecimentos = new EstabelecimentoService;
-        $estabelecimentos->getEstabelecimentos();
+
+        $this->estabelecimentoService->storeEstabelecimentos();
         return Estabelecimento::latest()->paginate(10);
     }
 

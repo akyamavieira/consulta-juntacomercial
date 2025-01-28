@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Factories\EstabelecimentoDTOFactory;
+use App\Factory\EstabelecimentoDTO;
 use App\Handlers\RateLimitHandler;
 use App\Repository\EstabelecimentoRepository;
 use Illuminate\Support\Collection;

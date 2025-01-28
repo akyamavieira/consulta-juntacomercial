@@ -14,6 +14,7 @@ class EstabelecimentosTable extends Component
     protected $paginationTheme = 'tailwind';
 
     protected $listeners = ['refreshTable' => '$refresh'];
+    public $page = 1;
 
     public function mostrarDetalhes($identificador)
     {

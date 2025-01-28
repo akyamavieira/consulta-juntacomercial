@@ -96,7 +96,9 @@ class EstabelecimentoService
     {
         try {
             Log::info("Fazendo requisição HTTP para a URL: $url...");
-            $response = Http::post($url, array_merge($payload, $this->getAuthCredentials()));
+            $response = Http::withOptions([
+                'verify' => false,
+            ])->post($url, array_merge($payload, $this->getAuthCredentials()));
             if ($response->successful()) {
                 $data = $response->json();
                 if (is_callable($callback)) {

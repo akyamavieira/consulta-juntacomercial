@@ -14,7 +14,6 @@ class EstabelecimentosTable extends Component
     protected $paginationTheme = 'tailwind';
 
     protected $listeners = ['refreshTable' => '$refresh'];
-    public $page = 1;
 
     public function mostrarDetalhes($identificador)
     {
@@ -25,7 +24,7 @@ class EstabelecimentosTable extends Component
     public function getEstabelecimentosProperty()
     {
         \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
-        return Estabelecimento::latest()->paginate(10, ['*'], 'page', $this->page);
+        return Estabelecimento::latest()->paginate(10);
     }
 
     public function render()

@@ -17,7 +17,4 @@ Route::get('/wait', function () {
 // Rotas de autenticação com Keycloak
 Route::get('/login', [LoginController::class, 'redirectToKeycloak'])->name('login')->withoutMiddleware([VerifyKeycloakAuth::class]);
 Route::get('/callback', [LoginController::class, 'handleKeycloakCallback'])->name('callback')->withoutMiddleware([VerifyKeycloakAuth::class]);
-
-Route::get('/home', function(){
-    echo 'home';
-})->name('home')->middleware(VerifyKeycloakAuth::class);
+Route::post('/backchannel-logout', [LoginController::class, 'backchannelLogout'])->name('backchannel.logout');

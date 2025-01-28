@@ -1,4 +1,3 @@
-<!-- No arquivo da view -->
 <a href="#" 
    wire:click.prevent="logout" 
    class="block text-lg hover:bg-gray-200 rounded-full p-2 transition duration-300 font-bold text-right">

@@ -7,6 +7,7 @@ use App\DTO\EstabelecimentoDTO;
 use App\Models\Estabelecimento;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Log;
 
 class EstabelecimentoService
@@ -60,6 +61,7 @@ class EstabelecimentoService
         if (!empty($identificadores)) {
             $this->informaRecebimento($identificadores);
         }
+        Cache::forget('estabelecimentos');
     }
 
     public function getEstabelecimentoPorIdentificador(string $identificador)

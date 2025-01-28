@@ -24,7 +24,7 @@ class EstabelecimentosTable extends Component
     public function getEstabelecimentosProperty()
     {
         \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
-        return Estabelecimento::latest()->paginate(10);
+        return Estabelecimento::latest()->paginate(10, ['*'], 'page', $this->page);
     }
 
     public function render()

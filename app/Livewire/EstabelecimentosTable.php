@@ -3,69 +3,38 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
+use App\Models\Estabelecimento;
 use App\Services\EstabelecimentoService;
-use App\DTO\DetalhesEstabelecimentoDTO;
-use Carbon\Carbon;
 
 class EstabelecimentosTable extends Component
 {
-    public $estabelecimentos;
-    public $detalhesEstabelecimento;
+    use WithPagination;
+
     public $mostrarModal = false;
-    protected $estabelecimentoService;
+    protected $paginationTheme = 'tailwind';
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    protected $listeners = ['refreshTable' => '$refresh'];
+
+    public function mostrarDetalhes($identificador)
     {
-        $this->estabelecimentoService = $estabelecimentoService;
+        \Log::info('mostrarDetalhes chamado com identificador: ' . $identificador);
+        $this->dispatch('mostrarDetalhes', identificador: $identificador);
     }
 
-    public function mount()
+    public function getEstabelecimentosProperty()
     {
-        $this->estabelecimentos = $this->estabelecimentoService->getEstabelecimentos();
-    }
-
-    public function mostrarDetalhes($cnpj)
-    {
-        // Busca os detalhes do estabelecimento pelo CNPJ
-        $dados = $this->estabelecimentoService->getEstabelecimentoPorCnpj($cnpj)['registrosRedesim']['registroRedesim'][0]['dadosRedesim'];
-        $this->detalhesEstabelecimento = [
-            'cnpj' => $dados['cnpj'] ?? 'Campo não informado',
-            'nomeEmpresarial' => $dados['nomeEmpresarial'] ?? 'Campo não informado',
-            'nomeFantasia' => $dados['nomeFantasia'] ?? 'Campo não informado',
-            'dataInicioAtividade' => $dados['dataInicioAtividade'] ?? 'Campo não informado',
-            'nuProcessoOrgaoRegistro' => $dados['nuProcessoOrgaoRegistro'] ?? 'Campo não informado',
-            'situacaoCadastralRFB_descricao' => $dados['situacaoCadastralRFB']['descricao'] ?? 'Campo não informado',
-            'opcaoSimplesNacional' => $dados['opcaoSimplesNacional'] ?? 'Campo não informado',
-            'porte' => $dados['porte'] ?? 'Campo não informado',
-            'nuInscricaoMunicipal' => $dados['nuInscricaoMunicipal'] ?? 'Campo não informado',
-            'capitalSocial' => $dados['capitalSocial'] ?? 'Campo não informado',
-            'possuiEstabelecimento' => $dados['possuiEstabelecimento'] ?? 'Campo não informado',
-            'ultimaViabilidadeVinculada' => $dados['ultimaViabilidadeVinculada'] ?? 'Campo não informado',
-            'ultimaViabilidadeAnaliseEndereco' => $dados['ultimaViabilidadeAnaliseEndereco'] ?? 'Campo não informado',
-            'dataUltimaAnaliseEndereco' => $dados['dataUltimaAnaliseEndereco'] ?? 'Campo não informado',
-            'ultimoColetorEstadualWebVinculado' => $dados['ultimoColetorEstadualWebVinculado'] ?? 'Campo não informado',
-            'endereco_cep' => $dados['endereco']['cep'] ?? 'Campo não informado',
-            'endereco_logradouro' => $dados['endereco']['logradouro'] ?? 'Campo não informado',
-            'endereco_codTipoLogradouro' => $dados['endereco']['codTipoLogradouro'] ?? 'Campo não informado',
-            'endereco_numLogradouro' => $dados['endereco']['numLogradouro'] ?? 'Campo não informado',
-            'endereco_complemento' => $dados['endereco']['complemento'] ?? 'Campo não informado',
-            'endereco_bairro' => $dados['endereco']['bairro'] ?? 'Campo não informado',
-            'endereco_codMunicipio' => $dados['endereco']['codMunicipio'] ?? 'Campo não informado',
-            'endereco_uf' => $dados['endereco']['uf'] ?? 'Campo não informado',
-            'contato_ddd' => $dados['contato']['dddTelefone1'] ?? 'Campo não informado',
-            'contato_telefone1' => $dados['contato']['telefone1'] ?? 'Campo não informado',
-            'contato_email' => $dados['contato']['correioEletronico'] ?? 'Campo não informado'
-        ];
-
-        $this->mostrarModal = true;
-    }
-    public function fecharModal()
-    {
-        $this->mostrarModal = false; // Fecha o modal
+        \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
+        $estabelecimentos = new EstabelecimentoService;
+        $estabelecimentos->getEstabelecimentos();
+        return Estabelecimento::latest()->paginate(10);
     }
 
     public function render()
     {
-        return view('livewire.estabelecimentos-table');
+        \Log::info('Renderização do componente EstabelecimentosTable.');
+        return view('livewire.estabelecimentos-table', [
+            'estabelecimentos' => $this->estabelecimentos,
+        ]);
     }
 }

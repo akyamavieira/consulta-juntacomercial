@@ -3,124 +3,169 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
+use App\DTO\EstabelecimentoDTO;
+use App\Models\Estabelecimento;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Log;
 
 class EstabelecimentoService
 {
-    private $estabelecimentos;
+    private const BASE_URL = 'https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest';
+
     public function getEstabelecimentos()
     {
-        // Tenta pegar os dados do cache
-        $this->estabelecimentos = Cache::get('estabelecimentos');
-        //dd($this->estabelecimentos);
 
-        // Verifica se os dados estão no cache
-        if (!$this->estabelecimentos) {
-            Log::info('Cache não encontrado, fazendo a requisição HTTP...');
-
-            try {
-                // Faz a requisição HTTP
-                $response = Http::post('https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest/wsE013/recuperaEstabelecimentos', [
-                    'accessKeyId' => env('ACCESS_KEY_ID'),
-                    'secretAccessKey' => env('SECRET_ACCESS_KEY'),
-                    'maximoRegistros' => '50',
-                    'versao' => '2.8',
-                ]);
-                // Verifica se a resposta foi bem-sucedida
-                if ($response->successful() && $response->json()['status'] === 'OK') {
-                    $this->estabelecimentos = $response->json();
-                    Cache::put('estabelecimentos', $this->estabelecimentos, now()->addMinutes(5));
-                    Log::info('Dados armazenados no cache com sucesso.');
-                } else {
-                    // Log detalhado em caso de erro HTTP
-                    if ($response->successful() && isset($response['status']) && $response['status'] === 'NOK') {
-                        if (isset($response['mensagem']) && strpos($response['mensagem'], 'Somente após') !== false) {
-                            // Extrai o horário de quando a próxima requisição será permitida
-                            $message = $response['mensagem'];
-                            if (preg_match('/Somente após as (\d{2}:\d{2}:\d{2})/', $message, $matches))  {
-                                $nextRequestTimeStr = $matches[1];
-                                //dd($nextRequestTimeStr); // A hora extraída
-                                $nextRequestTime = Carbon::createFromFormat('H:i:s', $nextRequestTimeStr);
-                                //dd($nextRequestTime);
-                                $now = Carbon::now();
-                                // Diferença em segundos (valor absoluto ou relativo)
-                                $waitTime = intval($now->diffInSeconds($nextRequestTime, false));
-
-                                if ($nextRequestTime > $now) {
-                                    Log::warning("Aguarde $waitTime segundos até as {$nextRequestTime->format('H:i:s')} para tentar novamente.");
-                                    //dd($waitTime);
-                                    // Redirecionar para uma página de erro com o tempo restante
-                                    return redirect()->route('wait', [
-                                        'waitTime' => $waitTime,
-                                        'nextRequestTime' => $nextRequestTime->format('H:i:s')
-                                    ]);
-                                }
-                            } else {
-                                Log::error("Não foi possível extrair o horário da mensagem: $message");
-                            }
-                        }
-                    }
-                }
-            } catch (Exception $e) {
-                // Lida com erros de rede ou outros problemas
-                Log::error('Erro ao buscar dados: ' . $e->getMessage());
+        $data = $this->fetchData(
+            self::BASE_URL . '/wsE013/recuperaEstabelecimentos',
+            [
+                'maximoRegistros' => '50',
+                'versao' => '2.8',
+            ],
+            function ($data) {
+                $this->handleApiRateLimit($data);
             }
-        } else {
-            Log::info('Cache encontrado, retornando dados.');
-        }
+        );
 
-        // Retorna os dados ou o fallback seguro
-        return $this->estabelecimentos;
+        $estabelecimentosDTO = collect(
+            isset($data['registrosRedesim']['registroRedesim']) && is_array($data['registrosRedesim']['registroRedesim'])
+            ? $data['registrosRedesim']['registroRedesim']
+            : []
+        )->map(fn($item) => new EstabelecimentoDTO($item));
+
+        $estabelecimentosDTO->each(function ($dto) {
+            // Verifica se já existe um registro com o mesmo CNPJ no banco
+            $existingEstabelecimento = Estabelecimento::where('cnpj', $dto->cnpj)->first();
+
+            if ($existingEstabelecimento) {
+                // Se o registro existe e já está marcado como 'is_novo' => true, marca como false
+                if ($existingEstabelecimento->is_novo) {
+                    $existingEstabelecimento->update(['is_novo' => false]);
+                    Log::info("Estabelecimento com CNPJ {$dto->cnpj} marcado como 'is_novo' => false.");
+                }
+                // Atualiza o registro existente com os dados do DTO
+                $existingEstabelecimento->update((array) $dto);
+                Log::info("Estabelecimento com CNPJ {$dto->cnpj} atualizado.");
+            } else {
+                // Cria um novo registro no banco com o DTO, atribuindo 'is_novo' como true
+                $data = (array) $dto;
+                $data['is_novo'] = true; // Adiciona o campo 'is_novo' como true
+
+                Estabelecimento::create($data);
+                Log::info("Novo Estabelecimento criado com CNPJ {$dto->cnpj}.");
+            }
+        });
+
+        $identificadores = $estabelecimentosDTO->pluck('identificador')->toArray();
+        if (!empty($identificadores)) {
+            $this->informaRecebimento($identificadores);
+        }
+        Cache::forget('estabelecimentos');
     }
-    public function getEstabelecimentoPorCnpj(string $cnpj)
+
+    public function getEstabelecimentoPorIdentificador(string $identificador)
+    {
+        return Estabelecimento::where('identificador', $identificador)->first();
+    }
+
+    public function informaRecebimento(array $identificadores)
     {
         try {
-            // Cria uma chave única para o cache com base no CNPJ
-            $cacheKey = "estabelecimento_{$cnpj}";
+            $payload = array_merge($this->getAuthCredentials(), ['identificador' => $identificadores]);
+            $response = Http::post(self::BASE_URL . '/wsE013/informaRecebimento', $payload);
 
-            // Verifica se os dados estão no cache
-            $estabelecimento = Cache::get($cacheKey);
-
-            if ($estabelecimento) {
-                Log::info("Dados do estabelecimento para o CNPJ $cnpj encontrados no cache.");
-                return $estabelecimento;
-            }
-
-            Log::info("Dados do estabelecimento para o CNPJ $cnpj não encontrados no cache, fazendo requisição HTTP...");
-
-            // Faz a requisição HTTP para buscar os dados
-            $response = Http::post('https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest/wsE031/consultaEstabelecimentoPorCnpj', [
-                'accessKeyId' => env('ACCESS_KEY_ID'),
-                'secretAccessKey' => env('SECRET_ACCESS_KEY'),
-                'cnpj' => $cnpj
-            ]);
-
-            // Verifica se a resposta foi bem-sucedida
             if ($response->successful()) {
                 $data = $response->json();
-
-                if ($data['status'] === 'OK') {
-                    Log::info("Dados do estabelecimento para o CNPJ $cnpj encontrados com sucesso.");
-
-                    // Armazena os dados no cache por 5 minutos
-                    Cache::put($cacheKey, $data, now()->addMinutes(5));
-
+                if (($data['codigoRetornoWSEnum'] ?? null) === 'OK') {
+                    Log::info('Recebimento informado com sucesso.', $data);
                     return $data;
-                } else {
-                    Log::warning("Resposta com status diferente de OK para o CNPJ $cnpj: " . $data['mensagem']);
-                    return null;
                 }
+
+                Log::warning('Erro ao informar recebimento: ' . ($data['mensagem'] ?? 'Mensagem não especificada.'));
+                return $data;
             } else {
-                Log::error("Erro na requisição HTTP para o CNPJ $cnpj: " . $response->status());
+                Log::error("Erro na requisição HTTP ao informar recebimento. Status code: " . $response->status());
                 return null;
             }
         } catch (Exception $e) {
-            Log::error("Erro ao buscar dados para o CNPJ $cnpj: " . $e->getMessage());
+            Log::error('Erro ao processar o método informaRecebimento: ' . $e->getMessage());
             return null;
         }
     }
 
+    private function fetchData(string $url, array $payload, callable $callback = null)
+    {
+        try {
+            Log::info("Fazendo requisição HTTP para a URL: $url...");
+            $response = Http::withOptions([
+                'verify' => false,
+            ])->post($url, array_merge($payload, $this->getAuthCredentials()));
+            if ($response->successful()) {
+                $data = $response->json();
+                if (is_callable($callback)) {
+                    $callback($data);
+                }
+
+                if (is_array($data) && ($data['status'] ?? null) === 'OK') {
+                    $identificadores = collect($data["registrosRedesim"]["registroRedesim"])->pluck('identificador')->all();
+                    if (!empty($identificadores)) {
+                        $this->informaRecebimento($identificadores);
+                    }
+
+                    return $data;
+                }
+
+                Log::warning("Resposta da API com status diferente de OK: " . ($data['mensagem'] ?? 'Sem mensagem.'));
+            } else {
+                Log::error("Erro na requisição HTTP para a URL: $url. Status code: " . $response->status());
+            }
+
+            return null;
+        } catch (Exception $e) {
+            Log::error("Erro ao processar a requisição para a URL: $url. Mensagem: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function getAuthCredentials(): array
+    {
+        return [
+            'accessKeyId' => env('ACCESS_KEY_ID'),
+            'secretAccessKey' => env('SECRET_ACCESS_KEY'),
+        ];
+    }
+
+    private function handleApiRateLimit(?array $data)
+    {
+        $mensagem = $data['mensagem'] ?? null;
+
+        if ($mensagem && strpos($mensagem, 'Somente após') !== false) {
+            if (preg_match('/Somente após as (\d{2}:\d{2}:\d{2})/', $mensagem, $matches)) {
+                try {
+                    $nextRequestTime = Carbon::createFromFormat('H:i:s', $matches[1], 'UTC')->setDate(
+                        now()->year,
+                        now()->month,
+                        now()->day
+                    );
+                    $now = now();
+
+                    if ($nextRequestTime->lt($now)) {
+                        Log::info('O horário informado já passou, tentando novamente.');
+                        return;
+                    }
+
+                    $waitTime = $now->diffInSeconds($nextRequestTime, false);
+                    if ($waitTime > 0) {
+                        Log::warning("Aguarde $waitTime segundos até as {$nextRequestTime->format('H:i:s')} para tentar novamente.");
+                        throw new Exception("Limite de requisição atingido, aguarde $waitTime segundos.");
+                    }
+                } catch (Exception $e) {
+                    Log::error("Erro ao processar a mensagem de rate limit: " . $e->getMessage());
+                }
+            } else {
+                Log::error("Não foi possível interpretar a mensagem de rate limit.");
+            }
+        }
+    }
 }

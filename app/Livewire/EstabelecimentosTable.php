@@ -16,7 +16,7 @@ class EstabelecimentosTable extends Component
 
     protected $listeners = ['refreshTable' => '$refresh'];
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    public function boot(EstabelecimentoService $estabelecimentoService, Estabelecimento $estabelecimentos)
     {
         $this->estabelecimentoService = $estabelecimentoService;
     }
@@ -27,19 +27,12 @@ class EstabelecimentosTable extends Component
         $this->dispatch('mostrarDetalhes', identificador: $identificador);
     }
 
-    public function getEstabelecimentosProperty()
-    {
-        \Log::info('getEstabelecimentosProperty chamado para carregar estabelecimentos.');
-
-        $this->estabelecimentoService->storeEstabelecimentos();
-        return Estabelecimento::latest()->paginate(10);
-    }
-
     public function render()
     {
         \Log::info('Renderização do componente EstabelecimentosTable.');
-        return view('livewire.estabelecimentos-table', [
-            'estabelecimentos' => $this->estabelecimentos,
-        ]);
+        // Buscar os estabelecimentos paginados
+        $estabelecimentos = Estabelecimento::paginate(10);
+
+        return view('livewire.estabelecimentos-table', compact('estabelecimentos'));
     }
 }

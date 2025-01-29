@@ -7,7 +7,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use App\Services\EventosService;
 use App\Services\EstabelecimentoService;
-
+use App\Services\ApiService; // Add this
+use App\Repository\EstabelecimentoRepository; // Add this
+use App\Handlers\RateLimitHandler; // Add this
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,8 +23,13 @@ class AppServiceProvider extends ServiceProvider
             return new EventosService();
         });
 
+        // Registrar o EstabelecimentoService com suas dependências
         $this->app->singleton(EstabelecimentoService::class, function ($app) {
-            return new EstabelecimentoService();
+            return new EstabelecimentoService(
+                $app->make(ApiService::class), // Resolve ApiService
+                $app->make(EstabelecimentoRepository::class), // Resolve EstabelecimentoRepository
+                $app->make(RateLimitHandler::class) // Resolve RateLimitHandler
+            );
         });
     }
 
@@ -38,6 +45,5 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(function (\SocialiteProviders\Manager\SocialiteWasCalled $event) {
             $event->extendSocialite('keycloak', \SocialiteProviders\Keycloak\Provider::class);
         });
-
     }
 }

@@ -31,7 +31,7 @@ class EstabelecimentosTable extends Component
     {
         \Log::info('Renderização do componente EstabelecimentosTable.');
         // Buscar os estabelecimentos paginados
-        $estabelecimentos = Estabelecimento::paginate(10);
+        $estabelecimentos = Estabelecimento::latest()->paginate(10);
 
         return view('livewire.estabelecimentos-table', compact('estabelecimentos'));
     }

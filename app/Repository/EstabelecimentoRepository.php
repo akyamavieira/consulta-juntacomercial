@@ -12,6 +12,8 @@ class EstabelecimentoRepository
         $cnpj = $data['cnpj'];
         $existingEstabelecimento = Estabelecimento::where('cnpj', $cnpj)->first();
 
+        Estabelecimento::where('is_novo', true)->update(['is_novo' => false]);
+        
         if ($existingEstabelecimento) {
             if ($existingEstabelecimento->is_novo) {
                 $existingEstabelecimento->update(['is_novo' => false]);

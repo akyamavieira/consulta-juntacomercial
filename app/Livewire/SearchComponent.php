@@ -17,6 +17,10 @@ class SearchComponent extends Component
         $this->dispatch('searchByTerm', therme: $normalizeTherme);
     }
 
+    public function updatedSearch(){
+        $this->searchByTerm();
+    }
+
     public function render(){
         return view('livewire.search-component');
     }

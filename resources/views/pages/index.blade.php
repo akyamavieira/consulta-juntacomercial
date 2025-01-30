@@ -29,6 +29,7 @@
     Cadastradas
     ou Atualizadas</h1>
 <div>
+    @livewire('search-component')
     @livewire('estabelecimentos-table')
     @livewire('estabelecimento-detalhes')
 </div>

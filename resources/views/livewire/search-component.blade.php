@@ -1,4 +1,4 @@
-<form class="max-w-md mx-auto m-4" wire:submit.prevent="searchByCnpj">   
+<form class="max-w-md mx-auto m-4" wire:submit.prevent="searchByTerm">   
     <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
     <div class="relative">
         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">

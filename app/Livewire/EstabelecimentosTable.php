@@ -15,7 +15,7 @@ class EstabelecimentosTable extends Component
     protected $paginationTheme = 'tailwind';
     public $therme = '';
 
-    protected $listeners = ['refreshTable' => '$refresh', 'searchByCnpj' => 'handleSearchByTherme'];
+    protected $listeners = ['refreshTable' => '$refresh', 'searchByTerm' => 'handleSearchByTherme'];
 
     public function boot(EstabelecimentoService $estabelecimentoService, Estabelecimento $estabelecimentos)
     {

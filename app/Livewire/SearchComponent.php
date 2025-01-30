@@ -8,8 +8,17 @@ class SearchComponent extends Component
 {
     public $search = '';
 
-    public function searchByCnpj(){
-        $this->dispatch('searchByCnpj', therme: $this->search);
+    public function searchByTerm(){
+        if (isCnpj($this->search)) {
+            $normalizeTherme = unFormatCnpj($this->search);
+        } else {
+            $normalizeTherme = cleanSpaceExterns($this->search);
+        }
+        $this->dispatch('searchByTerm', therme: $normalizeTherme);
+    }
+
+    public function updatedSearch(){
+        $this->searchByTerm();
     }
 
     public function render(){

@@ -15,7 +15,7 @@ class EstabelecimentosTable extends Component
     protected $paginationTheme = 'tailwind';
     public $therme = '';
 
-    protected $listeners = ['refreshTable' => '$refresh', 'searchByCnpj' => 'handleSearchByTherme'];
+    protected $listeners = ['refreshTable' => '$refresh', 'searchByTerm' => 'handleSearchByTherme'];
 
     public function boot(EstabelecimentoService $estabelecimentoService, Estabelecimento $estabelecimentos)
     {
@@ -24,7 +24,7 @@ class EstabelecimentosTable extends Component
 
     public function handleSearchByTherme($therme)
     {
-        $this->therme = preg_replace('/[^0-9]/', '', $therme);
+        $this->therme = $therme;
     }
 
     public function mostrarDetalhes($identificador)
@@ -36,14 +36,13 @@ class EstabelecimentosTable extends Component
     public function render()
     {
         \Log::info('Renderização do componente EstabelecimentosTable.');
-
         $estabelecimentos = Estabelecimento::when($this->therme, function ($query) {
             return $query->where('cnpj', 'like', '%' . $this->therme . '%')
                    ->orwhere('nuInscricaoMunicipal','like','%' . $this->therme . '%')
                    ->orwhere('nomeEmpresarial','like','%'. $this->therme .'%')
                    ->orwhere('nomeFantasia','like','%'. $this->therme .'%');
         })->latest()->paginate(10);
-
+        //dd($estabelecimentos);
         return view('livewire.estabelecimentos-table', compact('estabelecimentos'));
     }
 }

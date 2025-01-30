@@ -65,3 +65,24 @@ if (!function_exists('formatPhone')) {
         return $formatted;
     }
 }
+
+// Valida se é um cnpj
+if (!function_exists('isCnpj')) {
+    function isCnpj($cnpj) {
+        return preg_match('/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/', $cnpj);
+    }
+}
+
+// Desformata um CNPJ para o padrão do banco
+if (!function_exists('unFormatCnpj')) {
+    function unFormatCnpj($cnpj) {
+        return preg_replace('/[^0-9]/', '', $cnpj);
+    }
+}
+
+//Limpa os espaços somente do início e do fim das frases
+if(!function_exists('cleanSpaceExterns')){
+    function cleanSpaceExterns($texto) {
+        return trim($texto,$characters = " \t\n\r\0\x0B");
+    }
+}

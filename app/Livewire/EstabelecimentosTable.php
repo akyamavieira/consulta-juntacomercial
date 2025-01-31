@@ -37,10 +37,10 @@ class EstabelecimentosTable extends Component
     {
         \Log::info('Renderização do componente EstabelecimentosTable.');
         $estabelecimentos = Estabelecimento::when($this->therme, function ($query) {
-            return $query->where('cnpj', 'like', '%' . $this->therme . '%')
-                   ->orwhere('nuInscricaoMunicipal','like','%' . $this->therme . '%')
-                   ->orwhere('nomeEmpresarial','like','%'. $this->therme .'%')
-                   ->orwhere('nomeFantasia','like','%'. $this->therme .'%');
+            return $query->where('cnpj', 'ILIKE', '%' . $this->therme . '%')
+                   ->orwhere('nuInscricaoMunicipal','ILIKE','%' . $this->therme . '%')
+                   ->orwhere('nomeEmpresarial','ILIKE','%'. $this->therme .'%')
+                   ->orwhere('nomeFantasia','ILIKE','%'. $this->therme .'%');
         })->latest()->paginate(10);
         //dd($estabelecimentos);
         return view('livewire.estabelecimentos-table', compact('estabelecimentos'));

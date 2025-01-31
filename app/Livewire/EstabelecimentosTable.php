@@ -38,11 +38,13 @@ class EstabelecimentosTable extends Component
         \Log::info('Renderização do componente EstabelecimentosTable.');
         $estabelecimentos = Estabelecimento::when($this->therme, function ($query) {
             return $query->where('cnpj', 'ILIKE', '%' . $this->therme . '%')
-                   ->orwhere('nuInscricaoMunicipal','ILIKE','%' . $this->therme . '%')
-                   ->orwhere('nomeEmpresarial','ILIKE','%'. $this->therme .'%')
-                   ->orwhere('nomeFantasia','ILIKE','%'. $this->therme .'%');
-        })->latest()->paginate(10);
-        //dd($estabelecimentos);
+                   ->orWhere('nuInscricaoMunicipal', 'ILIKE', '%' . $this->therme . '%')
+                   ->orWhere('nomeEmpresarial', 'ILIKE', '%' . $this->therme . '%')
+                   ->orWhere('nomeFantasia', 'ILIKE', '%' . $this->therme . '%');
+        })
+        ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
+        ->orderBy('updated_at', 'desc')
+        ->paginate(10);
         return view('livewire.estabelecimentos-table', compact('estabelecimentos'));
     }
 }

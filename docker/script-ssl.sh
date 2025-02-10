@@ -27,7 +27,7 @@ echo "<VirtualHost *:443>
     CustomLog \${APACHE_LOG_DIR}/access.log combined
 
     SSLEngine on
-    SSLCertificateFile /etc/ssl/certs/tls.crt
+    SSLCertificateFile /etc/ssl/certs/ca-certificates.crt
     SSLCertificateKeyFile /etc/ssl/certs/tls.key
 </VirtualHost>" > /etc/apache2/sites-available/default-ssl.conf
 

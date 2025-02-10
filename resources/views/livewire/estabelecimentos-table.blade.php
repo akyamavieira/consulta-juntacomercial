@@ -10,11 +10,11 @@
         </thead>
         <tbody>
             @forelse ($estabelecimentos as $index => $estabelecimento)
-                <tr class="border-t @if ($estabelecimento->updated_at->diffInHours(now()) <= 3) bg-green-50 @endif">
+                <tr class="border-t @if ($estabelecimento->updated_at->diffInHours(now()) <= 1) bg-green-50 @endif">
                     <!-- Nome da Empresa -->
                     <td class="px-3 py-3 text-sm text-gray-800 max-w-36 md:max-w-full flex items-center">
                         {{ $estabelecimento->nomeEmpresarial }}
-                        @if ($estabelecimento->updated_at->diffInHours(now()) <= 3)
+                        @if ($estabelecimento->updated_at->diffInHours(now()) <= 1)
                             <span class="ml-2 text-xs text-white bg-green-500 rounded-full px-2 py-1">
                                 Novo
                             </span>

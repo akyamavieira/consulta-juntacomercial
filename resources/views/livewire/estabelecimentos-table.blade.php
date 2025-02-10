@@ -53,6 +53,6 @@
     
     <!-- Paginação -->
     <div class="mt-4">
-        {{ $estabelecimentos->links() }}
+        {{ $estabelecimentos->links('vendor.pagination.tailwind') }}
     </div>
 </div>

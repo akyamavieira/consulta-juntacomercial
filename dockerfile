@@ -21,14 +21,14 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     software-properties-common \
     git \
-    zip \
     unzip \
     libzip-dev \
     libpng-dev \  
     libjpeg-dev \ 
     libfreetype6-dev \ 
     && docker-php-ext-configure gd --with-freetype --with-jpeg \ 
-    && docker-php-ext-install -j$(nproc) gd \ 
+    && docker-php-ext-install -j$(nproc) gd zip \
+    && docker-php-ext-enable zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Limpar pacotes não necessários

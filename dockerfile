@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libzip-dev \
+    php8.3-gd \
     && rm -rf /var/lib/apt/lists/*
 
 # Limpar pacotes não necessários

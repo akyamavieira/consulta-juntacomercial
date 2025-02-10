@@ -41,7 +41,7 @@ if (!function_exists('formatData')) {
 // Formata Dinheiro (R$ X.XXX,XX)
 if (!function_exists('formatDinheiro')) {
     function formatDinheiro($valor) {
-        return 'R$ ' . number_format($valor, 2, ',', '.');
+        return 'R$ ' . number_format((float) $valor, 2, ',', '.');
     }
 }
 

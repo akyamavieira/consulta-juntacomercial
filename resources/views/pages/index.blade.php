@@ -25,11 +25,20 @@
 @endsection
 
 @section('content')
-<h1 class="text-2xl font-semibold flex items-center justify-center text-center pt-24 pb-4">Empresas Recentemente
-    Cadastradas
-    ou Atualizadas</h1>
+<h1 class="text-2xl font-semibold flex items-center justify-center text-center pt-24 pb-4">Empresas Recentemente Cadastradas ou Atualizadas</h1>
 <div>
-    @livewire('search-component')
+    <div class="flex items-center justify-center gap-4 px-4">
+        <!-- Search Component (tamanho original) -->
+        <div>
+            @livewire('search-component')
+        </div>
+        
+        <!-- Export Button (próximo ao search) -->
+        <div>
+            @livewire('export-to-excel')
+        </div>
+    </div>
+
     @livewire('estabelecimentos-table')
     @livewire('estabelecimento-detalhes')
 </div>

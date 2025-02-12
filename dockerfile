@@ -47,6 +47,7 @@ COPY --from=composer_build /app/database /var/www/html/database
 COPY --from=composer_build /app/resources /var/www/html/resources
 COPY --from=composer_build /app/routes /var/www/html/routes
 COPY --from=composer_build /app/storage /var/www/html/storage
+COPY --from=composer_build /app/tests /var/www/html/tests
 COPY --from=composer_build /app/app /var/www/html/app
 COPY docker/script.sh /usr/local/bin/
 COPY .env* /var/www/html/

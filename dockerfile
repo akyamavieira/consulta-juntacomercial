@@ -1,46 +1,74 @@
-# Usar a imagem oficial do PHP com Apache
-FROM php:8.3-apache
-
-WORKDIR /var/www/html
-
+# Estágio de build para Node.js
+FROM node:20 AS node_build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
 COPY . .
+RUN npm run build
 
-# Copiar o script de instalação de dependências para o contêiner
-COPY docker/addictions.sh /usr/local/bin/addictions.sh
+# Estágio de build para Composer
+FROM php:8.3-cli AS composer_build
+WORKDIR /app
 
-# Copiar o arquivo de configuração do apacha (script.sh ou script-ssl.sh)
-COPY docker/script.sh docker/script-ssl.sh  /usr/local/bin/
-
-# Dar permissões de execução aos scripts
-RUN chmod +x /usr/local/bin/*.sh
-
-# Atualizar o sistema e instalar as dependências diretamente no Dockerfile
+# Instalar dependências do sistema e extensões PHP necessárias
 RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg2 \
-    lsb-release \
-    software-properties-common \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    libpq-dev \
     git \
     unzip \
-    libzip-dev \
-    libpng-dev \  
-    libjpeg-dev \ 
-    libfreetype6-dev \ 
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \ 
-    && docker-php-ext-install -j$(nproc) gd zip \
-    && docker-php-ext-enable zip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd zip pdo_pgsql pgsql \
     && rm -rf /var/lib/apt/lists/*
 
-# Limpar pacotes não necessários
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Instalar o Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Executar o script para instalar dependências e configurar o ambiente
-RUN /usr/local/bin/addictions.sh
+# Copiar todos os arquivos do projeto (incluindo app/Helpers)
+COPY . .
 
-# Definir permissões corretas
+# Instalar dependências do Composer
+RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
+
+# Estágio final
+FROM php:8.3-apache
+WORKDIR /var/www/html
+ENV SCRIPT_NAME=script.sh
+
+
+# Copiar apenas os arquivos necessários
+COPY --from=node_build /app/public /var/www/html/public
+COPY --from=composer_build /app/vendor /var/www/html/vendor
+COPY --from=composer_build /app/bootstrap /var/www/html/bootstrap
+COPY --from=composer_build /app/config /var/www/html/config
+COPY --from=composer_build /app/database /var/www/html/database
+COPY --from=composer_build /app/resources /var/www/html/resources
+COPY --from=composer_build /app/routes /var/www/html/routes
+COPY --from=composer_build /app/storage /var/www/html/storage
+COPY --from=composer_build /app/tests /var/www/html/tests
+COPY --from=composer_build /app/app /var/www/html/app
+COPY docker/script.sh /usr/local/bin/
+COPY .env* /var/www/html/
+
+# Instalar dependências do sistema e extensões PHP
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd zip pdo_pgsql pgsql \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Configurar permissões
 RUN chown -R www-data:www-data /var/www/html \
     && find /var/www/html -type d -exec chmod 755 {} \; \
-    && find /var/www/html -type f -exec chmod 644 {} \;
+    && find /var/www/html -type f -exec chmod 644 {} \; \
+    && chmod +x /usr/local/bin/*.sh
 
 # Definir o ServerName para suprimir o aviso
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf

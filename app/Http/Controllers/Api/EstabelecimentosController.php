@@ -28,7 +28,7 @@ class EstabelecimentosController extends Controller
             ->orderBy('ano')
             ->get();
 
-        return DataResource::collection($resultados,200);
+        return response()->json($resultados);
     }
 
     /**
@@ -38,20 +38,18 @@ class EstabelecimentosController extends Controller
     {
         $resultados = Estabelecimento::selectRaw('
                 EXTRACT(YEAR FROM "dataAberturaEstabelecimento") AS ano,
-                CASE 
-                    WHEN EXTRACT(MONTH FROM "dataAberturaEstabelecimento") <= 6 THEN 1
-                    ELSE 2
-                END AS semestre,
+                1 AS semestre, 
                 COUNT(*) AS total
             ')
+            ->whereRaw('EXTRACT(MONTH FROM "dataAberturaEstabelecimento") <= 6') // Apenas 1º semestre
+            ->whereRaw('EXTRACT(YEAR FROM "dataAberturaEstabelecimento") >= 1990') // Apenas anos de 1990 em diante
             ->groupBy('ano', 'semestre')
             ->orderBy('ano')
-            ->orderBy('semestre')
             ->get();
-
-        return DataResource::collection($resultados);
+    
+        return $resultados;
     }
-
+    
     /**
      * Agregação por Mês.
      */

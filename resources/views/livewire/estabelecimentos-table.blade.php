@@ -20,21 +20,20 @@
                             </span>
                         @endif
                     </td>
-                    
+
                     <!-- Nome do Responsável -->
                     <td class="px-3 py-3 text-sm text-gray-800 max-w-28 md:max-w-full">
                         {{ $estabelecimento->nomeResponsavel }}
                     </td>
-                    
+
                     <!-- Status -->
                     <td class="px-3 py-3 text-sm text-gray-800">
                         {{ $estabelecimento->codEvento }}
                     </td>
-                    
+
                     <!-- Ação -->
                     <td class="px-3 py-3">
-                        <button 
-                            wire:click="mostrarDetalhes('{{ $estabelecimento->identificador }}')"
+                        <button wire:click="mostrarDetalhes('{{ $estabelecimento->identificador }}')"
                             class="text-blue-500 hover:text-blue-700">
                             <img src="{{ asset('img/ver-detalhes.svg') }}" alt="Ver Detalhes"
                                 class="h-5 w-5 text-blue-500" />
@@ -50,9 +49,9 @@
             @endforelse
         </tbody>
     </table>
-    
+
     <!-- Paginação -->
     <div class="mt-4">
-        {{ $estabelecimentos->links('vendor.pagination.tailwind') }}
+        {{ $estabelecimentos->onEachSide(1)->links() }}
     </div>
 </div>

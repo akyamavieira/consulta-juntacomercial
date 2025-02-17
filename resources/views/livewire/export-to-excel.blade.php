@@ -1,11 +1,17 @@
-<div>
-<button wire:click="export"
-            class="bg-gradient-to-r from-green-600 to-green-500 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-70 active:scale-95">
-            <!-- Ícone de exportação do Heroicons -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-        </button>
+<div class="relative">
+    <button wire:click="export" wire:loading.attr="disabled" class="bg-transparent hover:bg-gray-200 p-3 rounded-full relative group">
+        <!-- Ícone de exportação do Heroicons -->
+        <img src="{{ asset('img/file-export.svg') }}" alt="Pesquisa" class="h-5 w-5" />
+        <!-- Tooltip -->
+        <span class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-max px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity">
+            Exporte para Excel
+        </span>
+    </button>
+
+    <!-- Spinner de carregamento -->
+    <div wire:loading class="absolute flex justify-center items-center">
+        <div class="w-8 h-8 border-4 border-gray-300 border-t-blue-500 border-t-4 rounded-full animate-spin"></div>
+    </div>
 
     @if (session()->has('error'))
         <div class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg border border-red-200">

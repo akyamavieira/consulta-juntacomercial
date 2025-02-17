@@ -13,18 +13,22 @@ class EstabelecimentosTable extends Component
 
     public $mostrarModal = false;
     protected $paginationTheme = 'tailwind';
-    public $therme = '';
 
-    protected $listeners = ['refreshTable' => '$refresh', 'searchByTerm' => 'handleSearchByTherme'];
+    public $query = '';
 
-    public function boot(EstabelecimentoService $estabelecimentoService, Estabelecimento $estabelecimentos)
+    protected $listeners = [
+        'refreshTable' => '$refresh',
+        'searchUpdated' => 'handleSearchUpdated', // Escuta o evento do SearchComponent
+    ];
+
+    public function boot(EstabelecimentoService $estabelecimentoService)
     {
         $this->estabelecimentoService = $estabelecimentoService;
     }
 
-    public function handleSearchByTherme($therme)
+    public function search()
     {
-        $this->therme = $therme;
+        $this->resetPage();
     }
 
     public function mostrarDetalhes($identificador)
@@ -33,18 +37,32 @@ class EstabelecimentosTable extends Component
         $this->dispatch('mostrarDetalhes', identificador: $identificador);
     }
 
+    /**
+     * Atualiza o termo de pesquisa quando o evento é recebido.
+     *
+     * @param string $query
+     */
+    public function handleSearchUpdated($query)
+    {
+        $this->query = $query;
+        $this->resetPage(); // Reseta a paginação ao atualizar a pesquisa
+    }
+
     public function render()
     {
-        \Log::info('Renderização do componente EstabelecimentosTable.');
-        $estabelecimentos = Estabelecimento::when($this->therme, function ($query) {
-            return $query->where('cnpj', 'ILIKE', '%' . $this->therme . '%')
-                   ->orWhere('nuInscricaoMunicipal', 'ILIKE', '%' . $this->therme . '%')
-                   ->orWhere('nomeEmpresarial', 'ILIKE', '%' . $this->therme . '%')
-                   ->orWhere('nomeFantasia', 'ILIKE', '%' . $this->therme . '%');
+        // Realiza a consulta com o termo de pesquisa
+        $estabelecimentos = Estabelecimento::where(function ($query) {
+            $query->where('cnpj', 'ILIKE', '%' . $this->query . '%')
+                  ->orWhere('nuInscricaoMunicipal', 'ILIKE', '%' . $this->query . '%')
+                  ->orWhere('nomeEmpresarial', 'ILIKE', '%' . $this->query . '%')
+                  ->orWhere('nomeFantasia', 'ILIKE', '%' . $this->query . '%');
         })
         ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
         ->orderBy('updated_at', 'desc')
         ->paginate(10);
-        return view('livewire.estabelecimentos-table', compact('estabelecimentos'));
+
+        return view('livewire.estabelecimentos-table', [
+            'estabelecimentos' => $estabelecimentos,
+        ]);
     }
 }

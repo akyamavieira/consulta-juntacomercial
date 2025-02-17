@@ -1,4 +1,4 @@
-<div class="relative">
+<div>
     <button wire:click="export" wire:loading.attr="disabled" class="bg-transparent hover:bg-gray-200 p-3 rounded-full relative group">
         <!-- Ícone de exportação do Heroicons -->
         <img src="{{ asset('img/file-export.svg') }}" alt="Pesquisa" class="h-5 w-5" />
@@ -7,15 +7,4 @@
             Exporte para Excel
         </span>
     </button>
-
-    <!-- Spinner de carregamento -->
-    <div wire:loading class="absolute flex justify-center items-center">
-        <div class="w-8 h-8 border-4 border-gray-300 border-t-blue-500 border-t-4 rounded-full animate-spin"></div>
-    </div>
-
-    @if (session()->has('error'))
-        <div class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg border border-red-200">
-            {{ session('error') }}
-        </div>
-    @endif
 </div>

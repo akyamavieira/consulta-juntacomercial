@@ -12,7 +12,6 @@ class EstabelecimentosTable extends Component
     use WithPagination;
 
     public $mostrarModal = false;
-    protected $paginationTheme = 'tailwind';
 
     public $query = '';
 
@@ -59,7 +58,7 @@ class EstabelecimentosTable extends Component
         })
         ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
         ->orderBy('updated_at', 'desc')
-        ->paginate(10);
+        ->simplePaginate(10);
 
         return view('livewire.estabelecimentos-table', [
             'estabelecimentos' => $estabelecimentos,

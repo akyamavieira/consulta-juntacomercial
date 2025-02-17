@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Estabelecimento;  // Importa o modelo Estabelecimento
 use App\Services\EventosService;
+use Livewire\Attributes\On; 
 
 class EstabelecimentoDetalhes extends Component
 {

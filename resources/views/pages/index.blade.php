@@ -32,10 +32,18 @@
 @endsection
 
 @section('content')
-    <h1 class="text-2xl font-semibold flex items-center justify-center text-center pt-24 pb-4">Empresas Recentemente
-        Cadastradas ou Atualizadas</h1>
-    <div>
-        @livewire('estabelecimentos-table')
-        @livewire('estabelecimento-detalhes')
+<body class="flex">
+    <div class="w-64 h-screen bg-gray-200 p-4 shadow-lg mt-20">
+        <h2 class="text-xl font-semibold mb-4">Filtros</h2>
+        <!-- Adicione seus filtros aqui -->
     </div>
+    <div class="flex-1 p-6">
+        <h1 class="text-2xl font-semibold flex items-center justify-center text-center pt-24 pb-4">Empresas Recentemente
+            Cadastradas ou Atualizadas</h1>
+        <div>
+            @livewire('estabelecimentos-table')
+            @livewire('estabelecimento-detalhes')
+        </div>
+    </div>
+</body>
 @endsection

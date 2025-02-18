@@ -58,7 +58,7 @@ class EstabelecimentosTable extends Component
         })
         ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
         ->orderBy('updated_at', 'desc')
-        ->simplePaginate(10);
+        ->Paginate(10);
 
         return view('livewire.estabelecimentos-table', [
             'estabelecimentos' => $estabelecimentos,

@@ -52,6 +52,6 @@
 
     <!-- Paginação -->
     <div class="mt-4">
-        {{ $estabelecimentos->onEachSide(1)->links() }}
+        {{ $estabelecimentos->links() }}
     </div>
 </div>

@@ -53,20 +53,23 @@ class EstabelecimentosController extends Controller
     /**
      * Agregação por Mês.
      */
-    public function aggregateByMonth()
+    public function aggregateByMonth($year = null)
     {
-        $resultados = Estabelecimento::selectRaw('
-                EXTRACT(YEAR FROM "dataAberturaEstabelecimento") AS ano,
-                EXTRACT(MONTH FROM "dataAberturaEstabelecimento") AS mes,
-                COUNT(*) AS total
-            ')
+        $year = $year ?? now()->year - 1; // Se não for enviado, pega o ano anterior
+
+    $resultados = Estabelecimento::selectRaw('
+            EXTRACT(YEAR FROM "dataAberturaEstabelecimento") AS ano,
+            EXTRACT(MONTH FROM "dataAberturaEstabelecimento") AS mes,
+            COUNT(*) AS total')
+            ->whereRaw('EXTRACT(YEAR FROM "dataAberturaEstabelecimento") = ?', [$year]) // Filtra pelo ano recebido
             ->groupBy('ano', 'mes')
             ->orderBy('ano')
             ->orderBy('mes')
             ->get();
 
-        return DataResource::collection($resultados);
+        return $resultados;
     }
+    
 
     /**
      * Agregação por Semana.

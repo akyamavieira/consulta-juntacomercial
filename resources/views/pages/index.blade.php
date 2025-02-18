@@ -32,18 +32,24 @@
 @endsection
 
 @section('content')
-<body class="flex">
-    <div class="w-64 h-screen bg-gray-200 p-4 shadow-lg mt-20">
-        <h2 class="text-xl font-semibold mb-4">Filtros</h2>
-        <!-- Adicione seus filtros aqui -->
-    </div>
-    <div class="flex-1 p-6">
-        <h1 class="text-2xl font-semibold flex items-center justify-center text-center pt-24 pb-4">Empresas Recentemente
-            Cadastradas ou Atualizadas</h1>
-        <div>
-            @livewire('estabelecimentos-table')
-            @livewire('estabelecimento-detalhes')
+
+    <body class="flex">
+        <!-- <div class="w-64 h-screen bg-gray-200 p-4 shadow-lg mt-20">
+            <h2 class="text-xl font-semibold mb-4">Filtros</h2>
+        </div> -->
+        <div class="flex-1 p-6">
+            <h1 class="text-2xl font-semibold flex items-center justify-center text-center pt-24 pb-4">Empresas Recentemente
+                Cadastradas ou Atualizadas</h1>
+            <div>
+                @livewire('estabelecimentos-table')
+                @livewire('estabelecimento-detalhes')
+            </div>
+            <!-- Gráfico -->
+            <h1 class="text-2xl font-semibold flex items-center justify-center text-center mt-4 pb-4">Estatíticas sobre Empresas 2010-2025</h1>
+            <div class="w-[400px] h-[430px] mx-auto rounded-[15px] shadow-gray-500 shadow-lg p-2.5">
+                <h1 class="text-center">Estabelecimentos Criados Por Ano</h1>
+                <canvas id="estabelecimentosChart" class="w-full h-full"></canvas>
+            </div>
         </div>
-    </div>
-</body>
+    </body>
 @endsection

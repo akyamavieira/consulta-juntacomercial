@@ -1,12 +1,8 @@
 import Chart from 'chart.js/auto';
 
 document.addEventListener("DOMContentLoaded", async function () {
-    const canvas = document.getElementById('estabelecimentosChart');
+    const canvas = document.getElementById('chartByYear');
     const ctx = canvas.getContext('2d');
-
-    // Definir a largura e a altura do canvas em pixels
-    canvas.width = 400;
-    canvas.height = 400;
 
     try {
         const response = await fetch('/api/estabelecimentos/byYear');

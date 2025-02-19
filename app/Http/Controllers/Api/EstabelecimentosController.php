@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Estabelecimento;
 use App\Http\Resources\DataResource;
+use DB;
 
 class EstabelecimentosController extends Controller
 {
@@ -46,10 +47,10 @@ class EstabelecimentosController extends Controller
             ->groupBy('ano', 'semestre')
             ->orderBy('ano')
             ->get();
-    
+
         return $resultados;
     }
-    
+
     /**
      * Agregação por Mês.
      */
@@ -57,7 +58,7 @@ class EstabelecimentosController extends Controller
     {
         $year = $year ?? now()->year - 1; // Se não for enviado, pega o ano anterior
 
-    $resultados = Estabelecimento::selectRaw('
+        $resultados = Estabelecimento::selectRaw('
             EXTRACT(YEAR FROM "dataAberturaEstabelecimento") AS ano,
             EXTRACT(MONTH FROM "dataAberturaEstabelecimento") AS mes,
             COUNT(*) AS total')
@@ -69,7 +70,23 @@ class EstabelecimentosController extends Controller
 
         return $resultados;
     }
-    
+    public function aggregateByMonthRange()
+    {
+        $currentYear = now()->year;
+        $startYear = 2010;
+
+        $resultados = Estabelecimento::selectRaw('
+            EXTRACT(YEAR FROM "dataAberturaEstabelecimento") AS ano,
+            EXTRACT(MONTH FROM "dataAberturaEstabelecimento") AS mes,
+            COUNT(*) AS total')
+            ->whereBetween(DB::raw('EXTRACT(YEAR FROM "dataAberturaEstabelecimento")'), [$startYear, $currentYear])
+            ->groupBy('ano', 'mes')
+            ->orderBy('ano')
+            ->orderBy('mes')
+            ->get();
+
+        return $resultados;
+    }
 
     /**
      * Agregação por Semana.

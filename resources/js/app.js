@@ -1,3 +1,4 @@
 import './bootstrap';
-import './chart';
+import './chartByYear';
+import './chartByMonth';
 

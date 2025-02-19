@@ -33,10 +33,11 @@
 
 @section('content')
 
-    <body class="flex bg-[#F5F7FB]">
-        <!-- <div class="w-64 h-screen bg-gray-200 p-4 shadow-md mt-20">
+    <body class="flex">
+        <div class="w-64 h-auto bg-[#F5F7FB] p-4 shadow-md mt-20">
                 <h2 class="text-xl font-semibold mb-4">Filtros</h2>
-            </div> -->
+                @livewire('estabelecimentos-filter')
+            </div>
         <div class="flex-1 p-6">
             <h1 class="text-2xl font-semibold flex items-center justify-center text-center pt-24 pb-4">Empresas Recentemente
                 Cadastradas ou Atualizadas</h1>

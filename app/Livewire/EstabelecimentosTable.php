@@ -16,11 +16,13 @@ class EstabelecimentosTable extends Component
     public $filterME = false;
     public $filterEPP = false;
     public $filterOutros = false;
+    public $filterBairros = []; // Array de bairros selecionados
 
     protected $listeners = [
         'refreshTable' => '$refresh',
-        'searchUpdated' => 'handleSearchUpdated', // Escuta o evento do SearchComponent
-        'filterUpdated' => 'handleFilterUpdated', // Escuta o evento do EstabelecimentosFilter
+        'searchUpdated' => 'handleSearchUpdated',
+        'filterUpdated' => 'handleFilterUpdated',
+        'filterBairroUpdated' => 'handleFilterBairroUpdated', // Novo evento para bairros
     ];
 
     public function boot(EstabelecimentoService $estabelecimentoService)
@@ -39,23 +41,12 @@ class EstabelecimentosTable extends Component
         $this->dispatch('mostrarDetalhes', identificador: $identificador);
     }
 
-    /**
-     * Atualiza o termo de pesquisa quando o evento é recebido.
-     *
-     * @param string $query
-     */
     public function handleSearchUpdated($query)
     {
         $this->query = $query;
-        $this->resetPage(); // Reseta a paginação ao atualizar a pesquisa
+        $this->resetPage();
     }
 
-    /**
-     * Atualiza os filtros quando o evento é recebido.
-     *
-     * @param string $filter
-     * @param bool $value
-     */
     public function handleFilterUpdated($filter, $value)
     {
         if ($filter === 'ME') {
@@ -65,7 +56,13 @@ class EstabelecimentosTable extends Component
         } elseif ($filter === 'OUTROS') {
             $this->filterOutros = $value;
         }
-        $this->resetPage(); // Reseta a paginação ao atualizar os filtros
+        $this->resetPage();
+    }
+
+    public function handleFilterBairroUpdated($bairros)
+    {
+        $this->filterBairros = $bairros;
+        $this->resetPage();
     }
 
     public function render()
@@ -89,12 +86,15 @@ class EstabelecimentosTable extends Component
                 }
             });
         })
+        ->when(!empty($this->filterBairros), function ($query) {
+            $query->whereIn('endereco_bairro', $this->filterBairros);
+        })
         ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
         ->orderBy('updated_at', 'desc')
         ->paginate(10);
-    
+
         return view('livewire.estabelecimentos-table', [
             'estabelecimentos' => $estabelecimentos,
         ]);
-    } 
+    }
 }

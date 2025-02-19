@@ -35,7 +35,6 @@ async function fetchEstabelecimentos() {
 
         const offsets = valores.map((_, index) => (index === maxIndex ? 30 : 0));
         const totalGeral = valores.reduce((acc, val) => acc + val, 0);
-        console.log(totalGeral.toString());
 
         const ctx = document.getElementById('chartByMonth');
         if (ctx) {

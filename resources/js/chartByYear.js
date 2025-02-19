@@ -7,9 +7,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
         const response = await fetch('/api/estabelecimentos/byYear');
         const data = await response.json();
-
         // Filtrar os dados para incluir apenas os anos a partir de 2010
-        const filteredData = data.filter(item => item.ano >= 2010);
+        const filteredData = data.filter(item => item.ano >= 2025);
 
         // Ordenar os dados por ano
         filteredData.sort((a, b) => a.ano - b.ano);
@@ -35,6 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     borderColor: borderColors,
                     borderWidth: 0, // Remover o stroke das barras
                     borderRadius: 10, // Adicionar border radius de 10px
+                    barThickness: 20 // Definir a largura das barras
                 }]
             },
             options: {

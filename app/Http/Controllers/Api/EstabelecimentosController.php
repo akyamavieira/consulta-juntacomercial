@@ -73,7 +73,7 @@ class EstabelecimentosController extends Controller
     public function aggregateByMonthRange()
     {
         $currentYear = now()->year;
-        $startYear = 2010;
+        $startYear = 2025;
 
         $resultados = Estabelecimento::selectRaw('
             EXTRACT(YEAR FROM "dataAberturaEstabelecimento") AS ano,
@@ -113,9 +113,11 @@ class EstabelecimentosController extends Controller
     {
         $resultados = Estabelecimento::selectRaw('"dataAberturaEstabelecimento" AS dia, COUNT(*) AS total')
             ->groupBy('dia')
-            ->orderBy('dia')
-            ->get();
-
+            ->orderBy('dia', 'desc')
+            ->limit(7)
+            ->get()
+            ->sortBy('dia'); // Reordenar para exibir em ordem crescente
+    
         return DataResource::collection($resultados);
     }
 }

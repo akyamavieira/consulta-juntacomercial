@@ -6,6 +6,7 @@ use App\Factory\EstabelecimentoDTOFactory;
 use App\Handlers\RateLimitHandler;
 use App\Repository\EstabelecimentoRepository;
 use Illuminate\Support\Collection;
+use App\Http\Controllers\AtualizarBairrosController;
 use Log;
 
 class EstabelecimentoService
@@ -32,9 +33,10 @@ class EstabelecimentoService
             $estabelecimentosDTO->each(fn ($dto) => $this->estabelecimentoRepository->updateOrCreate((array) $dto));
 
             $identificadores = $estabelecimentosDTO->pluck('identificador')->toArray();
-            if (! empty($identificadores)) {
+            if (!empty($identificadores)) {
                 $this->informaRecebimento($identificadores);
             }
+            
         }
     }
 

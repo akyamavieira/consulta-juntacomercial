@@ -13,6 +13,7 @@ class EstabelecimentosFilter extends Component
     public $filterBairros = []; // Array de bairros selecionados
 
     public $bairrosDisponiveis = []; // Lista de bairros disponíveis no banco
+    public $search = '';
 
     public function mount()
     {
@@ -40,6 +41,13 @@ class EstabelecimentosFilter extends Component
         $this->dispatch('filterBairroUpdated', $this->filterBairros);
     }
 
+    public function updatedSearch()
+    {
+        $this->bairrosDisponiveis = Estabelecimento::whereRaw('LOWER(endereco_bairro) LIKE ?', ['%' . strtolower($this->search) . '%'])
+            ->distinct()
+            ->pluck('endereco_bairro')
+            ->toArray();
+    }
     public function render()
     {
         return view('livewire.estabelecimentos-filter', [

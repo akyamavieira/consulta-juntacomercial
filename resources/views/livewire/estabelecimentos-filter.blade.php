@@ -18,6 +18,8 @@
     </div>
     <div class="bg-white p-4 rounded shadow-md">
         <h3 class="text-xl font-semibold mb-4">BAIRRO</h3>
+        <input type="text" wire:model.live="search" placeholder="Pesquisar bairros..."
+            class="form-input mt-1 block w-full">
         <select multiple wire:model.live="filterBairros" class="form-select mt-1 block w-full h-80">
             @foreach($bairrosDisponiveis as $bairro)
                 <option value="{{ $bairro }}">{{ $bairro }}</option>

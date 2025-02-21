@@ -16,13 +16,12 @@ class EstabelecimentosTable extends Component
     public $filterME = false;
     public $filterEPP = false;
     public $filterOutros = false;
-    public $filterBairros = []; // Array de bairros selecionados
+    public $filterBairros = [];
 
     protected $listeners = [
         'refreshTable' => '$refresh',
         'searchUpdated' => 'handleSearchUpdated',
         'filterUpdated' => 'handleFilterUpdated',
-        'filterBairroUpdated' => 'handleFilterBairroUpdated', // Novo evento para bairros
     ];
 
     public function boot(EstabelecimentoService $estabelecimentoService)
@@ -38,7 +37,7 @@ class EstabelecimentosTable extends Component
     public function mostrarDetalhes($identificador)
     {
         \Log::info('mostrarDetalhes chamado com identificador: ' . $identificador);
-        $this->dispatch('mostrarDetalhes', identificador: $identificador);
+        $this->dispatch('mostrarDetalhes', ['identificador' => $identificador]);
     }
 
     public function handleSearchUpdated($query)
@@ -49,19 +48,15 @@ class EstabelecimentosTable extends Component
 
     public function handleFilterUpdated($filter, $value)
     {
-        if ($filter === 'ME') {
+        if ($filter === 'filterME') {
             $this->filterME = $value;
-        } elseif ($filter === 'EPP') {
+        } elseif ($filter === 'filterEPP') {
             $this->filterEPP = $value;
-        } elseif ($filter === 'OUTROS') {
+        } elseif ($filter === 'filterOutros') {
             $this->filterOutros = $value;
+        } elseif ($filter === 'filterBairros') {
+            $this->filterBairros = is_array($value) ? $value : [];
         }
-        $this->resetPage();
-    }
-
-    public function handleFilterBairroUpdated($bairros)
-    {
-        $this->filterBairros = $bairros;
         $this->resetPage();
     }
 

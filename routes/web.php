@@ -4,10 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EstabelecimentosController;
 use App\Http\Middleware\VerifyKeycloakAuth;
+use App\Http\Controllers\AtualizarBairrosController;
+
+Route::get('/atualizar-bairros', [AtualizarBairrosController::class, 'atualizar']);
 
 // Rota principal protegida por middleware
 Route::get('/', [EstabelecimentosController::class, 'index'])
-    ->name('index')->middleware(VerifyKeycloakAuth::class);
+    ->name('index');
 
 // Rota de espera (também protegida por middleware)
 Route::get('/wait', function () {

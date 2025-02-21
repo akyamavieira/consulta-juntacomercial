@@ -10,44 +10,41 @@ class EstabelecimentosFilter extends Component
     public $filterME = false;
     public $filterEPP = false;
     public $filterOutros = false;
-    public $filterBairros = []; // Array de bairros selecionados
-
-    public $bairrosDisponiveis = []; // Lista de bairros disponíveis no banco
+    public $filterBairros = [];
+    public $bairrosDisponiveis = [];
     public $search = '';
 
     public function mount()
     {
-        // Busca os bairros distintos na base de dados
         $this->bairrosDisponiveis = Estabelecimento::distinct()->pluck('endereco_bairro')->toArray();
     }
 
-    public function updatedFilterME($value)
+    public function updated($propertyName)
     {
-        $this->dispatch('filterUpdated', 'ME', $value);
+        if (in_array($propertyName, ['filterME', 'filterEPP', 'filterOutros'])) {
+            $this->dispatch('filterUpdated', filter: $propertyName, value: $this->$propertyName);
+        } elseif (strpos($propertyName, 'filterBairros') === 0) {
+            $this->dispatch('filterUpdated', filter: 'filterBairros', value: $this->filterBairros);
+        } elseif ($propertyName === 'search') {
+            $this->bairrosDisponiveis = Estabelecimento::whereRaw('LOWER(endereco_bairro) LIKE ?', ['%' . strtolower($this->search) . '%'])
+                ->distinct()
+                ->pluck('endereco_bairro')
+                ->toArray();
+        }
     }
 
-    public function updatedFilterEPP($value)
+    public function clearAllFilters()
     {
-        $this->dispatch('filterUpdated', 'EPP', $value);
+        $this->filterME = false;
+        $this->filterEPP = false;
+        $this->filterOutros = false;
+        $this->filterBairros = [];
+        $this->dispatch('filterUpdated', filter: 'filterME', value: $this->filterME);
+        $this->dispatch('filterUpdated', filter: 'filterEPP', value: $this->filterEPP);
+        $this->dispatch('filterUpdated', filter: 'filterOutros', value: $this->filterOutros);
+        $this->dispatch('filterUpdated', filter: 'filterBairros', value: $this->filterBairros);
     }
 
-    public function updatedFilterOutros($value)
-    {
-        $this->dispatch('filterUpdated', 'OUTROS', $value);
-    }
-
-    public function updatedFilterBairros()
-    {
-        $this->dispatch('filterBairroUpdated', $this->filterBairros);
-    }
-
-    public function updatedSearch()
-    {
-        $this->bairrosDisponiveis = Estabelecimento::whereRaw('LOWER(endereco_bairro) LIKE ?', ['%' . strtolower($this->search) . '%'])
-            ->distinct()
-            ->pluck('endereco_bairro')
-            ->toArray();
-    }
     public function render()
     {
         return view('livewire.estabelecimentos-filter', [

@@ -35,8 +35,6 @@ class EstabelecimentoService
             $identificadores = $estabelecimentosDTO->pluck('identificador')->toArray();
             if (!empty($identificadores)) {
                 $this->informaRecebimento($identificadores);
-                // Chamar o comando UpdateMunicipios com os identificadores
-                $this->callUpdateMunicipios($identificadores);
             }
         }
     }
@@ -50,11 +48,5 @@ class EstabelecimentoService
         } else {
             Log::warning('Erro ao informar recebimento: '.($response['mensagem'] ?? 'Mensagem não especificada.'));
         }
-    }
-
-    private function callUpdateMunicipios(array $identificadores)
-    {
-        // Executar o comando UpdateMunicipios passando os identificadores
-        Artisan::call('update:municipios', ['identificadores' => $identificadores]);
     }
 }

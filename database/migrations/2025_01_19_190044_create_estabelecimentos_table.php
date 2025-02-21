@@ -39,7 +39,7 @@ return new class extends Migration
             $table->string('endereco_numLogradouro')->nullable();
             $table->string('endereco_complemento')->nullable();
             $table->string('endereco_bairro')->nullable();
-            $table->string('endereco_codMunicipio')->nullable();
+            $table->unsignedBigInteger('endereco_codMunicipio')->nullable();
             $table->string('endereco_uf')->nullable();
             $table->timestamps();
         });

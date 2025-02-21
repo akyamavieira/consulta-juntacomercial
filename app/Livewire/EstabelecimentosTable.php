@@ -17,6 +17,7 @@ class EstabelecimentosTable extends Component
     public $filterEPP = false;
     public $filterOutros = false;
     public $filterBairros = [];
+    public $filterMunicipios = []; // Nova propriedade para municípios
 
     protected $listeners = [
         'refreshTable' => '$refresh',
@@ -56,6 +57,8 @@ class EstabelecimentosTable extends Component
             $this->filterOutros = $value;
         } elseif ($filter === 'filterBairros') {
             $this->filterBairros = is_array($value) ? $value : [];
+        } elseif ($filter === 'filterMunicipios') {
+            $this->filterMunicipios = is_array($value) ? $value : [];
         }
         $this->resetPage();
     }
@@ -83,6 +86,11 @@ class EstabelecimentosTable extends Component
         })
         ->when(!empty($this->filterBairros), function ($query) {
             $query->whereIn('endereco_bairro', $this->filterBairros);
+        })
+        ->when(!empty($this->filterMunicipios), function ($query) {
+            $query->whereHas('municipio', function ($subQuery) {
+                $subQuery->whereIn('city', $this->filterMunicipios);
+            });
         })
         ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
         ->orderBy('updated_at', 'desc')

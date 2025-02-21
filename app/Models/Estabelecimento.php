@@ -38,4 +38,8 @@ class Estabelecimento extends Model
         'is_novo',
         'municipio',
     ];
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class, 'endereco_codMunicipio', 'id');
+    }
 }

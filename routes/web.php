@@ -10,7 +10,7 @@ Route::get('/atualizar-bairros', [AtualizarBairrosController::class, 'atualizar'
 
 // Rota principal protegida por middleware
 Route::get('/', [EstabelecimentosController::class, 'index'])
-    ->name('index');
+    ->name('index')->withoutMiddleware([VerifyKeycloakAuth::class]);
 
 // Rota de espera (também protegida por middleware)
 Route::get('/wait', function () {

@@ -23,7 +23,6 @@ class EstabelecimentoService
             'maximoRegistros' => '50',
             'versao' => '2.8',
         ]);
-        dd($data['registrosRedesim']['registroRedesim']);
         if ($data) {
             $this->rateLimitHandler->handle($data);
 

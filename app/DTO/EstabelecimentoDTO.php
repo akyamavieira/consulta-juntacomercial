@@ -1,7 +1,6 @@
 <?php
 
 namespace App\DTO;
-use App\Services\CepService;
 
 class EstabelecimentoDTO
 {
@@ -39,7 +38,6 @@ class EstabelecimentoDTO
 
     public function __construct(array $alldata)
     {
-        $cepService = new CepService();
         $data = $alldata['dadosRedesim'] ?? [];
         $eventos = $alldata['eventos']['evento'] ?? [];
 
@@ -69,7 +67,7 @@ class EstabelecimentoDTO
         $this->endereco_codTipoLogradouro = isset($data['endereco']['codTipoLogradouro']) ? (int) $data['endereco']['codTipoLogradouro'] : null;
         $this->endereco_numLogradouro = $data['endereco']['numLogradouro'] ?? 'Campo não informado';
         $this->endereco_complemento = $data['endereco']['complemento'] ?? null;
-        $this->endereco_bairro = mb_strtoupper($cepService->buscarBairroPorCep($this->endereco_cep), 'UTF-8');
+        $this->endereco_bairro = mb_strtoupper($data['endereco']['bairro'] ?? 'Campo não informado', 'UTF-8');
         $this->endereco_codMunicipio = isset($data['endereco']['codMunicipio']) ? (int) $data['endereco']['codMunicipio'] : null;
         $this->endereco_uf = $data['endereco']['uf'] ?? 'Campo não informado';
         $this->cnae = $data["atividadesEconomica"]["cnaeFiscal"]["codigo"] ?? 'Campo não informado';

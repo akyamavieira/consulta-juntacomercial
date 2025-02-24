@@ -18,6 +18,8 @@ class EstabelecimentosTable extends Component
     public $filterOutros = false;
     public $filterBairros = [];
     public $filterMunicipios = []; // Nova propriedade para municípios
+    public $filterSetores = []; // Nova propriedade para setores
+    public $filterSituacaoCadastral = []; // Nova propriedade para situação cadastral
 
     protected $listeners = [
         'refreshTable' => '$refresh',
@@ -59,6 +61,10 @@ class EstabelecimentosTable extends Component
             $this->filterBairros = is_array($value) ? $value : [];
         } elseif ($filter === 'filterMunicipios') {
             $this->filterMunicipios = is_array($value) ? $value : [];
+        } elseif ($filter === 'filterSetores') {
+            $this->filterSetores = is_array($value) ? $value : [];
+        } elseif ($filter === 'filterSituacaoCadastral') {
+            $this->filterSituacaoCadastral = is_array($value) ? $value : [];
         }
         $this->resetPage();
     }
@@ -91,6 +97,12 @@ class EstabelecimentosTable extends Component
             $query->whereHas('municipio', function ($subQuery) {
                 $subQuery->whereIn('city', $this->filterMunicipios);
             });
+        })
+        ->when(!empty($this->filterSetores), function ($query) {
+            $query->whereIn('setor', $this->filterSetores);
+        })
+        ->when(!empty($this->filterSituacaoCadastral), function ($query) {
+            $query->whereIn('situacaoCadastralRFB_descricao', $this->filterSituacaoCadastral);
         })
         ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
         ->orderBy('updated_at', 'desc')

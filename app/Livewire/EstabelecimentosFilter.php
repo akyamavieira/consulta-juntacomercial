@@ -13,10 +13,16 @@ class EstabelecimentosFilter extends Component
     public $filterOutros = false;
     public $filterBairros = [];
     public $filterMunicipios = []; // Nova propriedade para municípios
+    public $filterSetores = []; // Nova propriedade para setores
+    public $filterSituacaoCadastral = []; // Nova propriedade para situação cadastral
     public $bairrosDisponiveis = [];
     public $municipiosDisponiveis = []; // Nova propriedade para municípios disponíveis
+    public $setoresDisponiveis = []; // Nova propriedade para setores disponíveis
+    public $situacoesCadastraisDisponiveis = []; // Nova propriedade para situações cadastrais disponíveis
     public $searchBairro = '';
     public $searchMunicipio = '';
+    public $searchSetor = ''; // Nova propriedade para pesquisa de setores
+    public $searchSituacaoCadastral = ''; // Nova propriedade para pesquisa de situação cadastral
 
     public function mount()
     {
@@ -25,6 +31,8 @@ class EstabelecimentosFilter extends Component
             ->distinct()
             ->pluck('municipios.city')
             ->toArray();
+        $this->setoresDisponiveis = Estabelecimento::distinct()->pluck('setor')->toArray(); // Carrega os setores disponíveis
+        $this->situacoesCadastraisDisponiveis = Estabelecimento::distinct()->pluck('situacaoCadastralRFB_descricao')->toArray(); // Carrega as situações cadastrais disponíveis
     }
 
     public function updated($propertyName)
@@ -35,6 +43,10 @@ class EstabelecimentosFilter extends Component
             $this->dispatch('filterUpdated', filter: 'filterBairros', value: $this->filterBairros);
         } elseif (strpos($propertyName, 'filterMunicipios') === 0) {
             $this->dispatch('filterUpdated', filter: 'filterMunicipios', value: $this->filterMunicipios);
+        } elseif (strpos($propertyName, 'filterSetores') === 0) {
+            $this->dispatch('filterUpdated', filter: 'filterSetores', value: $this->filterSetores);
+        } elseif (strpos($propertyName, 'filterSituacaoCadastral') === 0) {
+            $this->dispatch('filterUpdated', filter: 'filterSituacaoCadastral', value: $this->filterSituacaoCadastral);
         } elseif ($propertyName === 'searchBairro') {
             $this->bairrosDisponiveis = Estabelecimento::whereRaw('LOWER(endereco_bairro) LIKE ?', ['%' . strtolower($this->searchBairro) . '%'])
                 ->distinct()
@@ -44,6 +56,16 @@ class EstabelecimentosFilter extends Component
             $this->municipiosDisponiveis = Municipio::whereRaw('LOWER(city) LIKE ?', ['%' . strtolower($this->searchMunicipio) . '%'])
                 ->distinct()
                 ->pluck('city')
+                ->toArray();
+        } elseif ($propertyName === 'searchSetor') {
+            $this->setoresDisponiveis = Estabelecimento::whereRaw('LOWER(setor) LIKE ?', ['%' . strtolower($this->searchSetor) . '%'])
+                ->distinct()
+                ->pluck('setor')
+                ->toArray();
+        } elseif ($propertyName === 'searchSituacaoCadastral') {
+            $this->situacoesCadastraisDisponiveis = Estabelecimento::whereRaw('LOWER(situacaoCadastralRFB_descricao) LIKE ?', ['%' . strtolower($this->searchSituacaoCadastral) . '%'])
+                ->distinct()
+                ->pluck('situacaoCadastralRFB_descricao')
                 ->toArray();
         }
     }
@@ -55,11 +77,15 @@ class EstabelecimentosFilter extends Component
         $this->filterOutros = false;
         $this->filterBairros = [];
         $this->filterMunicipios = []; // Limpa o filtro de municípios
+        $this->filterSetores = []; // Limpa o filtro de setores
+        $this->filterSituacaoCadastral = []; // Limpa o filtro de situação cadastral
         $this->dispatch('filterUpdated', filter: 'filterME', value: $this->filterME);
         $this->dispatch('filterUpdated', filter: 'filterEPP', value: $this->filterEPP);
         $this->dispatch('filterUpdated', filter: 'filterOutros', value: $this->filterOutros);
         $this->dispatch('filterUpdated', filter: 'filterBairros', value: $this->filterBairros);
         $this->dispatch('filterUpdated', filter: 'filterMunicipios', value: $this->filterMunicipios);
+        $this->dispatch('filterUpdated', filter: 'filterSetores', value: $this->filterSetores);
+        $this->dispatch('filterUpdated', filter: 'filterSituacaoCadastral', value: $this->filterSituacaoCadastral);
     }
 
     public function render()
@@ -67,6 +93,8 @@ class EstabelecimentosFilter extends Component
         return view('livewire.estabelecimentos-filter', [
             'bairrosDisponiveis' => $this->bairrosDisponiveis,
             'municipiosDisponiveis' => $this->municipiosDisponiveis, // Passa os municípios disponíveis para a view
+            'setoresDisponiveis' => $this->setoresDisponiveis, // Passa os setores disponíveis para a view
+            'situacoesCadastraisDisponiveis' => $this->situacoesCadastraisDisponiveis, // Passa as situações cadastrais disponíveis para a view
         ]);
     }
 }

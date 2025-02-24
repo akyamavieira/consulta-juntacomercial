@@ -9,13 +9,6 @@ use App\Http\Middleware\VerifyKeycloakAuth;
 Route::get('/', [EstabelecimentosController::class, 'index'])
     ->name('index')->middleware([VerifyKeycloakAuth::class]);
 
-Route::get('/bairro/{cep}', [EstabelecimentosController::class, 'buscarBairro']);
-
-// Rota de espera (também protegida por middleware)
-Route::get('/wait', function () {
-    return view('errors.wait');
-})->name("wait");
-
 // Rotas de autenticação com Keycloak
 Route::get('/login', [LoginController::class, 'redirectToKeycloak'])->name('login')->withoutMiddleware([VerifyKeycloakAuth::class]);
 Route::get('/callback', [LoginController::class, 'handleKeycloakCallback'])->name('callback')->withoutMiddleware([VerifyKeycloakAuth::class]);

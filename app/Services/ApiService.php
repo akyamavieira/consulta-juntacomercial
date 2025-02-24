@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class ApiService
 {
-    private const BASE_URL = 'https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest';
+    private const BASE_URL = 'https://projetointegrar.jucerr.rr.gov.br/IntegradorEstadualWEB/rest/wsE013';
 
     public function post(string $endpoint, array $payload = [])
     {

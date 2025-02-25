@@ -20,6 +20,7 @@ class EstabelecimentosTable extends Component
     public $filterMunicipios = []; // Nova propriedade para municípios
     public $filterSetores = []; // Nova propriedade para setores
     public $filterSituacaoCadastral = []; // Nova propriedade para situação cadastral
+    public $filterCapitalSocial = [];
 
     protected $listeners = [
         'refreshTable' => '$refresh',
@@ -65,6 +66,8 @@ class EstabelecimentosTable extends Component
             $this->filterSetores = is_array($value) ? $value : [];
         } elseif ($filter === 'filterSituacaoCadastral') {
             $this->filterSituacaoCadastral = is_array($value) ? $value : [];
+        } elseif ($filter === 'filterCapitalSocial') {
+            $this->filterCapitalSocial = is_array($value) ? $value : [];
         }
         $this->resetPage();
     }
@@ -103,6 +106,23 @@ class EstabelecimentosTable extends Component
         })
         ->when(!empty($this->filterSituacaoCadastral), function ($query) {
             $query->whereIn('situacaoCadastralRFB_descricao', $this->filterSituacaoCadastral);
+        })
+        ->when(!empty($this->filterCapitalSocial), function ($query) {
+            $query->where(function ($subQuery) {
+                foreach ($this->filterCapitalSocial as $filtro) {
+                    if ($filtro === 'ate_100mil') {
+                        $subQuery->orWhere('capitalSocial', '<=', 100000);
+                    } elseif ($filtro === 'ate_1milhao') {
+                        $subQuery->orWhereBetween('capitalSocial', [100000, 1000000]);
+                    } elseif ($filtro === 'ate_100milhoes') {
+                        $subQuery->orWhereBetween('capitalSocial', [1000000, 100000000]);
+                    } elseif ($filtro === 'ate_1bilhao') {
+                        $subQuery->orWhereBetween('capitalSocial', [100000000, 1000000000]);
+                    } elseif ($filtro === 'acima_de_1bilhao') {
+                        $subQuery->orWhere('capitalSocial', '>', 1000000000);
+                    }
+                }
+            });
         })
         ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
         ->orderBy('updated_at', 'desc')

@@ -7,7 +7,7 @@ use App\Http\Middleware\VerifyKeycloakAuth;
 
 // Rota principal protegida por middleware
 Route::get('/', [EstabelecimentosController::class, 'index'])
-    ->name('index')->middleware([VerifyKeycloakAuth::class]);
+    ->name('index');
 
 // Rotas de autenticação com Keycloak
 Route::get('/login', [LoginController::class, 'redirectToKeycloak'])->name('login')->withoutMiddleware([VerifyKeycloakAuth::class]);

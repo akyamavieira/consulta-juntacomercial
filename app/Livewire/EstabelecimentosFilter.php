@@ -23,6 +23,7 @@ class EstabelecimentosFilter extends Component
     public $searchMunicipio = '';
     public $searchSetor = ''; // Nova propriedade para pesquisa de setores
     public $searchSituacaoCadastral = ''; // Nova propriedade para pesquisa de situação cadastral
+    public $filterCapitalSocial = [];
 
     public function mount()
     {
@@ -67,6 +68,8 @@ class EstabelecimentosFilter extends Component
                 ->distinct()
                 ->pluck('situacaoCadastralRFB_descricao')
                 ->toArray();
+        } elseif (strpos($propertyName, 'filterCapitalSocial') === 0) {
+            $this->dispatch('filterUpdated', filter: 'filterCapitalSocial', value: $this->filterCapitalSocial);
         }
     }
 
@@ -79,6 +82,7 @@ class EstabelecimentosFilter extends Component
         $this->filterMunicipios = []; // Limpa o filtro de municípios
         $this->filterSetores = []; // Limpa o filtro de setores
         $this->filterSituacaoCadastral = []; // Limpa o filtro de situação cadastral
+        $this->filterCapitalSocial = [];
         $this->dispatch('filterUpdated', filter: 'filterME', value: $this->filterME);
         $this->dispatch('filterUpdated', filter: 'filterEPP', value: $this->filterEPP);
         $this->dispatch('filterUpdated', filter: 'filterOutros', value: $this->filterOutros);
@@ -86,6 +90,7 @@ class EstabelecimentosFilter extends Component
         $this->dispatch('filterUpdated', filter: 'filterMunicipios', value: $this->filterMunicipios);
         $this->dispatch('filterUpdated', filter: 'filterSetores', value: $this->filterSetores);
         $this->dispatch('filterUpdated', filter: 'filterSituacaoCadastral', value: $this->filterSituacaoCadastral);
+        $this->dispatch('filterUpdated', filter: 'filterCapitalSocial', value: $this->filterCapitalSocial);
     }
 
     public function render()

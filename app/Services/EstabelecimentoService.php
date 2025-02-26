@@ -4,9 +4,8 @@ namespace App\Services;
 
 use App\Factory\EstabelecimentoDTOFactory;
 use App\Handlers\RateLimitHandler;
-use App\Repository\EstabelecimentoRepository;
+use App\Repositories\EstabelecimentoRepository;
 use Illuminate\Support\Collection;
-use App\Models\Estabelecimento;
 use Log;
 
 class EstabelecimentoService

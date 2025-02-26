@@ -4,8 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Estabelecimento;
-use App\Services\EstabelecimentoService;
+use App\Repositories\EstabelecimentoRepository;
 
 class EstabelecimentosTable extends Component
 {
@@ -17,9 +16,9 @@ class EstabelecimentosTable extends Component
     public $filterEPP = false;
     public $filterOutros = false;
     public $filterBairros = [];
-    public $filterMunicipios = []; // Nova propriedade para municípios
-    public $filterSetores = []; // Nova propriedade para setores
-    public $filterSituacaoCadastral = []; // Nova propriedade para situação cadastral
+    public $filterMunicipios = [];
+    public $filterSetores = [];
+    public $filterSituacaoCadastral = [];
     public $filterCapitalSocial = [];
 
     protected $listeners = [
@@ -28,16 +27,17 @@ class EstabelecimentosTable extends Component
         'filterUpdated' => 'handleFilterUpdated',
     ];
 
-    public function boot(EstabelecimentoService $estabelecimentoService)
+    protected $estabelecimentoRepository;
+
+    public function boot(EstabelecimentoRepository $estabelecimentoRepository)
     {
-        $this->estabelecimentoService = $estabelecimentoService;
+        $this->estabelecimentoRepository = $estabelecimentoRepository;
     }
 
     public function search()
     {
         $this->resetPage();
     }
-
     public function mostrarDetalhes($identificador)
     {
         \Log::info('mostrarDetalhes chamado com identificador: ' . $identificador);
@@ -74,59 +74,17 @@ class EstabelecimentosTable extends Component
 
     public function render()
     {
-        $estabelecimentos = Estabelecimento::where(function ($query) {
-            $query->where('cnpj', 'ILIKE', '%' . $this->query . '%')
-                  ->orWhere('nuInscricaoMunicipal', 'ILIKE', '%' . $this->query . '%')
-                  ->orWhere('nomeEmpresarial', 'ILIKE', '%' . $this->query . '%')
-                  ->orWhere('nomeFantasia', 'ILIKE', '%' . $this->query . '%');
-        })
-        ->when($this->filterME || $this->filterEPP || $this->filterOutros, function ($query) {
-            $query->where(function ($subQuery) {
-                if ($this->filterME) {
-                    $subQuery->orWhere('porte', 'ME');
-                }
-                if ($this->filterEPP) {
-                    $subQuery->orWhere('porte', 'EPP');
-                }
-                if ($this->filterOutros) {
-                    $subQuery->orWhereNotIn('porte', ['ME', 'EPP']);
-                }
-            });
-        })
-        ->when(!empty($this->filterBairros), function ($query) {
-            $query->whereIn('endereco_bairro', $this->filterBairros);
-        })
-        ->when(!empty($this->filterMunicipios), function ($query) {
-            $query->whereHas('municipio', function ($subQuery) {
-                $subQuery->whereIn('city', $this->filterMunicipios);
-            });
-        })
-        ->when(!empty($this->filterSetores), function ($query) {
-            $query->whereIn('setor', $this->filterSetores);
-        })
-        ->when(!empty($this->filterSituacaoCadastral), function ($query) {
-            $query->whereIn('situacaoCadastralRFB_descricao', $this->filterSituacaoCadastral);
-        })
-        ->when(!empty($this->filterCapitalSocial), function ($query) {
-            $query->where(function ($subQuery) {
-                foreach ($this->filterCapitalSocial as $filtro) {
-                    if ($filtro === 'ate_100mil') {
-                        $subQuery->orWhere('capitalSocial', '<=', 100000);
-                    } elseif ($filtro === 'ate_1milhao') {
-                        $subQuery->orWhereBetween('capitalSocial', [100000, 1000000]);
-                    } elseif ($filtro === 'ate_100milhoes') {
-                        $subQuery->orWhereBetween('capitalSocial', [1000000, 100000000]);
-                    } elseif ($filtro === 'ate_1bilhao') {
-                        $subQuery->orWhereBetween('capitalSocial', [100000000, 1000000000]);
-                    } elseif ($filtro === 'acima_de_1bilhao') {
-                        $subQuery->orWhere('capitalSocial', '>', 1000000000);
-                    }
-                }
-            });
-        })
-        ->orderByRaw('CASE WHEN updated_at >= ? THEN 0 ELSE 1 END', [now()->subHour()])
-        ->orderBy('updated_at', 'desc')
-        ->paginate(10);
+        $estabelecimentos = $this->estabelecimentoRepository->buscarEstabelecimentos([
+            'query' => $this->query,
+            'filterME' => $this->filterME,
+            'filterEPP' => $this->filterEPP,
+            'filterOutros' => $this->filterOutros,
+            'filterBairros' => $this->filterBairros,
+            'filterMunicipios' => $this->filterMunicipios,
+            'filterSetores' => $this->filterSetores,
+            'filterSituacaoCadastral' => $this->filterSituacaoCadastral,
+            'filterCapitalSocial' => $this->filterCapitalSocial,
+        ]);
 
         return view('livewire.estabelecimentos-table', [
             'estabelecimentos' => $estabelecimentos,

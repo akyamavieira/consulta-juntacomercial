@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\URL;
 use App\Services\EventosService;
 use App\Services\EstabelecimentoService;
 use App\Services\ApiService; // Add this
-use App\Repository\EstabelecimentoRepository; // Add this
+use App\Repositories\EstabelecimentoRepository; // Add this
 use App\Handlers\RateLimitHandler; // Add this
 
 class AppServiceProvider extends ServiceProvider

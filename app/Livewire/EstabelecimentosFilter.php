@@ -5,16 +5,12 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Repositories\EstabelecimentoRepository;
 use App\Repositories\MunicipioRepository;
+use App\Livewire\Concerns\WithFilters;
 
 class EstabelecimentosFilter extends Component
 {
-    public $filterME = false;
-    public $filterEPP = false;
-    public $filterOutros = false;
-    public $filterBairros = [];
-    public $filterMunicipios = [];
-    public $filterSetores = [];
-    public $filterSituacaoCadastral = [];
+    use WithFilters;
+
     public $bairrosDisponiveis = [];
     public $municipiosDisponiveis = [];
     public $setoresDisponiveis = [];
@@ -23,7 +19,6 @@ class EstabelecimentosFilter extends Component
     public $searchMunicipio = '';
     public $searchSetor = '';
     public $searchSituacaoCadastral = '';
-    public $filterCapitalSocial = [];
 
     protected $estabelecimentoRepository;
     protected $municipioRepository;
@@ -65,26 +60,6 @@ class EstabelecimentosFilter extends Component
         } elseif (strpos($propertyName, 'filterSetores') === 0) {
             $this->dispatch('filterUpdated', filter: 'filterSetores', value: $this->filterSetores);
         }
-    }
-
-    public function clearAllFilters()
-    {
-        $this->filterME = false;
-        $this->filterEPP = false;
-        $this->filterOutros = false;
-        $this->filterBairros = [];
-        $this->filterMunicipios = [];
-        $this->filterSetores = [];
-        $this->filterSituacaoCadastral = [];
-        $this->filterCapitalSocial = [];
-        $this->dispatch('filterUpdated', filter: 'filterME', value: $this->filterME);
-        $this->dispatch('filterUpdated', filter: 'filterEPP', value: $this->filterEPP);
-        $this->dispatch('filterUpdated', filter: 'filterOutros', value: $this->filterOutros);
-        $this->dispatch('filterUpdated', filter: 'filterBairros', value: $this->filterBairros);
-        $this->dispatch('filterUpdated', filter: 'filterMunicipios', value: $this->filterMunicipios);
-        $this->dispatch('filterUpdated', filter: 'filterSetores', value: $this->filterSetores);
-        $this->dispatch('filterUpdated', filter: 'filterSituacaoCadastral', value: $this->filterSituacaoCadastral);
-        $this->dispatch('filterUpdated', filter: 'filterCapitalSocial', value: $this->filterCapitalSocial);
     }
 
     public function render()

@@ -39,26 +39,26 @@ class EstabelecimentosFilter extends Component
 
     public function updated($propertyName)
     {
-        if (in_array($propertyName, ['filterME', 'filterEPP', 'filterOutros'])) {
-            $this->dispatch('filterUpdated', filter: $propertyName, value: $this->$propertyName);
-        } elseif ($propertyName === 'searchBairro') {
-            $this->bairrosDisponiveis = $this->estabelecimentoRepository->buscarBairrosPorNome($this->searchBairro);
-        } elseif ($propertyName === 'searchMunicipio') {
-            $this->municipiosDisponiveis = $this->municipioRepository->buscarMunicipiosPorNome($this->searchMunicipio);
-        } elseif ($propertyName === 'searchSetor') {
-            $this->setoresDisponiveis = $this->estabelecimentoRepository->buscarSetoresPorNome($this->searchSetor);
-        } elseif ($propertyName === 'searchSituacaoCadastral') {
-            $this->situacoesCadastraisDisponiveis = $this->estabelecimentoRepository->buscarSituacoesCadastraisPorNome($this->searchSituacaoCadastral);
-        } elseif (strpos($propertyName, 'filterSituacaoCadastral') === 0) {
-            $this->dispatch('filterUpdated', filter: 'filterSituacaoCadastral', value: $this->filterSituacaoCadastral);
-        } elseif (strpos($propertyName, 'filterCapitalSocial') === 0) {
-            $this->dispatch('filterUpdated', filter: 'filterCapitalSocial', value: $this->filterCapitalSocial);
-        } elseif (strpos($propertyName, 'filterBairros') === 0) {
-            $this->dispatch('filterUpdated', filter: 'filterBairros', value: $this->filterBairros);
-        } elseif (strpos($propertyName, 'filterMunicipios') === 0) {
-            $this->dispatch('filterUpdated', filter: 'filterMunicipios', value: $this->filterMunicipios);
-        } elseif (strpos($propertyName, 'filterSetores') === 0) {
-            $this->dispatch('filterUpdated', filter: 'filterSetores', value: $this->filterSetores);
+        $searchFilters = [
+            'searchBairro' => fn() => $this->bairrosDisponiveis = $this->estabelecimentoRepository->buscarBairrosPorNome($this->searchBairro),
+            'searchMunicipio' => fn() => $this->municipiosDisponiveis = $this->municipioRepository->buscarMunicipiosPorNome($this->searchMunicipio),
+            'searchSetor' => fn() => $this->setoresDisponiveis = $this->estabelecimentoRepository->buscarSetoresPorNome($this->searchSetor),
+            'searchSituacaoCadastral' => fn() => $this->situacoesCadastraisDisponiveis = $this->estabelecimentoRepository->buscarSituacoesCadastraisPorNome($this->searchSituacaoCadastral),
+        ];
+    
+        $dispatchFilters = [
+            'filterME', 'filterEPP', 'filterOutros',
+            'filterSituacaoCadastral', 'filterCapitalSocial',
+            'filterBairros', 'filterMunicipios', 'filterSetores'
+        ];
+    
+        // Remove índices de arrays, ex: transforma 'filterSituacaoCadastral.0' em 'filterSituacaoCadastral'
+        $baseProperty = explode('.', $propertyName)[0];
+    
+        if (isset($searchFilters[$propertyName])) {
+            $searchFilters[$propertyName]();
+        } elseif (in_array($baseProperty, $dispatchFilters, true)) {
+            $this->dispatch('filterUpdated', filter: $baseProperty, value: $this->$baseProperty);
         }
     }
 
